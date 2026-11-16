@@ -1,0 +1,18 @@
+# ACL por cliente (grupo 15). Ver design-plan.md, secção 2.
+
+# Client 1: estações (publisher do stage 2)
+user client1
+topic write idc/fc15/status/+
+topic write idc/fc15/trips/started
+topic write idc/fc15/trips/ended
+
+# Processor: recebe os dados das estações e publica os tópicos internos
+user processor
+topic read idc/fc15/status/+
+topic read idc/fc15/trips/started
+topic read idc/fc15/trips/ended
+topic write idc/fc15/internal/#
+
+# Node-RED: só lê os tópicos internos
+user nodered
+topic read idc/fc15/internal/#

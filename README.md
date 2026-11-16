@@ -31,32 +31,69 @@ Todas as comunicações usam TLS, com certificados assinados por uma CA própria
 
 ## Base de dados
 
-`stations`, `station_status` (`seq` único), `trips` (criada no `trip_started`, completada no `trip_ended`) e `station_clusters` (chave `(station_id, trained_at)`).
+Esquema em [db/init/01_schema.sql](db/init/01_schema.sql): `stations`, `station_status` (`seq` único), `trips` (criada no `trip_started`, completada no `trip_ended`) e `station_clusters` (chave `(station_id, trained_at)`).
+Utilizadores em [db/init/02_users.sh](db/init/02_users.sh), todos com TLS obrigatório: o `processor` escreve os dados, o `ml` lê tudo e escreve só `station_clusters`, o `nodered` só lê.
 
 ## Estrutura
 
 ```
-dataset-IdC-2627/      # stations.json, stage1_offline.jsonl, stage2_online.jsonl
-design-plan.md         # desenho da solução
-certs/                 # certificados TLS gerados localmente (não versionados)
+docker-compose.yml        # os 5 serviços da cloud
+.env.example              # variáveis (copiar para .env)
+design-plan.md            # desenho da solução
+scripts/gen-certs.sh      # gera a CA e os certificados TLS
+certs/                    # certificados (gerados localmente, não versionados)
+mosquitto/config/         # mosquitto.conf, acl, entrypoint.sh (passwords vêm do .env)
+db/init/                  # esquema SQL e utilizadores (correm na 1.ª inicialização)
+processor/app/            # Processor: main, bootstrap, listener (T1), worker (T2), writer (T3), scheduler (T4)
+ml/app/                   # serviço ML: Flask, features, modelo
+nodered/data/             # settings.js (HTTPS, login) e flows.json (dashboard)
+client1/publisher.py      # Client 1, corre no host
+dataset-IdC-2627/         # stations.json, stage1_offline.jsonl, stage2_online.jsonl
 ```
+
+## Divisão do trabalho
+
+A infraestrutura já funciona: Docker Compose, TLS em todas as ligações, broker com ACL, esquema da BD, Node-RED com HTTPS e login. Também está feito o código partilhado do Processor: configuração, contratos entre threads (`contracts.py`), ligações TLS ao MySQL, ao MQTT e ao ML, o T1 Listener e o arranque em `main.py`.
+
+O que falta está marcado com `TODO(<parte>)` no código. Enquanto uma parte não estiver feita, a app arranca na mesma e mostra um aviso no log.
+
+| Parte | Ficheiros | O que implementar |
+|---|---|---|
+| **client1** | `client1/publisher.py` | `replay()`: espera `Δts / speed`, publica com QoS 1 |
+| **processor/bootstrap** | `processor/app/bootstrap.py` | `stations_loaded()`, `load_stations()`, `feed_stage1()` |
+| **processor/T2** | `processor/app/worker.py`, `calc.py` | parse, validação, `quality_flag`, Haversine, kWh, custo |
+| **processor/T3** | `processor/app/writer.py` | inserts em batch e idempotentes, contadores, `internal/status/<id>` |
+| **processor/T4** | `processor/app/scheduler.py` | `live_summary` a cada 2 s, retreino a cada 6 h de tempo de evento |
+| **ml** | `ml/app/features.py`, `model.py` | features por estação, K-Means (k = 3, 4, 5), `station_clusters` |
+| **dashboard** | Node-RED (editor) → `nodered/data/flows.json` | páginas de histórico, página live, mapa de clusters |
+
+Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros partilhados: `contracts.py`, `01_schema.sql`, `acl`, `docker-compose.yml`.
 
 ## Como correr
 
-1. Copiar as variáveis de ambiente e preencher as passwords:
+1. Copiar as variáveis de ambiente e preencher as passwords (instruções no próprio ficheiro):
    ```bash
    cp .env.example .env
    ```
-2. Gerar a CA e os certificados do broker, Node-RED, MySQL e ML para `certs/`.
-3. Levantar os serviços (no arranque, o Processor carrega o stage 1 se a BD estiver vazia e pede o primeiro treino):
+2. Gerar a CA e os certificados (Git Bash no Windows):
+   ```bash
+   bash scripts/gen-certs.sh
+   ```
+3. Levantar os serviços. No arranque, o Processor carrega o stage 1 se a BD estiver vazia e pede o primeiro treino:
    ```bash
    docker compose up -d --build
+   docker compose logs -f processor
    ```
-4. Correr o publisher do stage 2 no host, com o fator de velocidade pretendido:
+4. Correr o publisher do stage 2 no host:
    ```bash
+   pip install -r client1/requirements.txt
    python client1/publisher.py --speed 60
    ```
-5. Abrir o dashboard em `https://localhost:1880`.
+5. Abrir o editor em `https://localhost:1880` e o dashboard em `https://localhost:1880/ui`. O browser avisa sobre o certificado, que é da CA do grupo: aceitar ou importar `certs/ca.crt`.
+
+Notas:
+- O esquema e os utilizadores da BD só são criados na primeira inicialização. Depois de os alterar, recriar o volume com `docker compose down -v`. Isto apaga os dados.
+- No Node-RED, os nós MQTT ligam a `mosquitto:1883` com TLS (CA `/certs/ca.crt`) e utilizador `nodered`. Os nós MySQL ligam a `db:3306` com o utilizador `nodered`. As passwords estão nas variáveis de ambiente `MQTT_PASSWORD` e `DB_PASSWORD` do container (usar `${MQTT_PASSWORD}` nos campos).
 
 ## Dataset
 

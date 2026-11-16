@@ -1,0 +1,18 @@
+#!/bin/bash
+# Cria um utilizador por serviço, todos obrigados a usar TLS.
+# Só o Processor escreve os dados; o ML lê tudo e escreve apenas station_clusters; o Node-RED só lê.
+set -e
+
+mysql -uroot -p"$MYSQL_ROOT_PASSWORD" <<SQL
+CREATE USER IF NOT EXISTS '${DB_PROCESSOR_USER}'@'%' IDENTIFIED BY '${DB_PROCESSOR_PASSWORD}' REQUIRE SSL;
+GRANT SELECT, INSERT, UPDATE, DELETE ON \`${MYSQL_DATABASE}\`.* TO '${DB_PROCESSOR_USER}'@'%';
+
+CREATE USER IF NOT EXISTS '${DB_ML_USER}'@'%' IDENTIFIED BY '${DB_ML_PASSWORD}' REQUIRE SSL;
+GRANT SELECT ON \`${MYSQL_DATABASE}\`.* TO '${DB_ML_USER}'@'%';
+GRANT INSERT, DELETE ON \`${MYSQL_DATABASE}\`.station_clusters TO '${DB_ML_USER}'@'%';
+
+CREATE USER IF NOT EXISTS '${DB_NODERED_USER}'@'%' IDENTIFIED BY '${DB_NODERED_PASSWORD}' REQUIRE SSL;
+GRANT SELECT ON \`${MYSQL_DATABASE}\`.* TO '${DB_NODERED_USER}'@'%';
+
+FLUSH PRIVILEGES;
+SQL

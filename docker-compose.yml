@@ -1,0 +1,130 @@
+# Plataforma de bike-sharing (IdC 2026/27, grupo 15). Ver design-plan.md.
+# Antes de arrancar: cp .env.example .env (preencher) e bash scripts/gen-certs.sh
+name: bikesharing
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0.20
+    entrypoint: ["/bin/sh", "/mosquitto/config/entrypoint.sh"]
+    environment:
+      MQTT_CLIENT1_USER: ${MQTT_CLIENT1_USER:?defina no .env}
+      MQTT_CLIENT1_PASSWORD: ${MQTT_CLIENT1_PASSWORD:?defina no .env}
+      MQTT_PROCESSOR_USER: ${MQTT_PROCESSOR_USER:?defina no .env}
+      MQTT_PROCESSOR_PASSWORD: ${MQTT_PROCESSOR_PASSWORD:?defina no .env}
+      MQTT_NODERED_USER: ${MQTT_NODERED_USER:?defina no .env}
+      MQTT_NODERED_PASSWORD: ${MQTT_NODERED_PASSWORD:?defina no .env}
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./certs/mosquitto.crt:/certs/server.crt:ro
+      - ./certs/mosquitto.key:/certs/server.key:ro
+      - mosquitto_data:/mosquitto/data
+    ports:
+      - "1883:1883"   # MQTT sobre TLS
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    command:
+      - --ssl-ca=/certs/ca.crt
+      - --ssl-cert=/certs/server.crt
+      - --ssl-key=/certs/server.key
+      - --require-secure-transport=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina no .env}
+      MYSQL_DATABASE: ${DB_NAME}
+      DB_PROCESSOR_USER: ${DB_PROCESSOR_USER}
+      DB_PROCESSOR_PASSWORD: ${DB_PROCESSOR_PASSWORD:?defina no .env}
+      DB_ML_USER: ${DB_ML_USER}
+      DB_ML_PASSWORD: ${DB_ML_PASSWORD:?defina no .env}
+      DB_NODERED_USER: ${DB_NODERED_USER}
+      DB_NODERED_PASSWORD: ${DB_NODERED_PASSWORD:?defina no .env}
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./certs/db.crt:/certs/server.crt:ro
+      - ./certs/db.key:/certs/server.key:ro
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  ml:
+    build: ./ml
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_ML_USER}
+      DB_PASSWORD: ${DB_ML_PASSWORD}
+      CA_CERT: /certs/ca.crt
+      TLS_CERT: /certs/server.crt
+      TLS_KEY: /certs/server.key
+    volumes:
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./certs/ml.crt:/certs/server.crt:ro
+      - ./certs/ml.key:/certs/server.key:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  processor:
+    build: ./processor
+    environment:
+      TOPIC_PREFIX: ${TOPIC_PREFIX}
+      MQTT_HOST: ${MQTT_HOST}
+      MQTT_PORT: ${MQTT_PORT}
+      MQTT_USER: ${MQTT_PROCESSOR_USER}
+      MQTT_PASSWORD: ${MQTT_PROCESSOR_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_PROCESSOR_USER}
+      DB_PASSWORD: ${DB_PROCESSOR_PASSWORD}
+      ML_URL: ${ML_URL}
+      RETRAIN_EVERY_HOURS: ${RETRAIN_EVERY_HOURS}
+      SUMMARY_INTERVAL_S: ${SUMMARY_INTERVAL_S}
+      CA_CERT: /certs/ca.crt
+      DATASET_DIR: /dataset
+    volumes:
+      - ./dataset-IdC-2627:/dataset:ro
+      - ./certs/ca.crt:/certs/ca.crt:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+      ml:
+        condition: service_started
+    restart: unless-stopped
+
+  nodered:
+    build: ./nodered
+    environment:
+      TZ: America/New_York
+      NODERED_ADMIN_USER: ${NODERED_ADMIN_USER}
+      NODERED_ADMIN_PASSWORD_HASH: ${NODERED_ADMIN_PASSWORD_HASH:?defina no .env}
+      NODERED_CREDENTIAL_SECRET: ${NODERED_CREDENTIAL_SECRET:?defina no .env}
+      MQTT_USER: ${MQTT_NODERED_USER}
+      MQTT_PASSWORD: ${MQTT_NODERED_PASSWORD}
+      DB_USER: ${DB_NODERED_USER}
+      DB_PASSWORD: ${DB_NODERED_PASSWORD}
+    volumes:
+      - ./nodered/data:/data
+      - ./certs/ca.crt:/certs/ca.crt:ro
+      - ./certs/nodered.crt:/certs/server.crt:ro
+      - ./certs/nodered.key:/certs/server.key:ro
+    ports:
+      - "1880:1880"   # dashboard e editor (HTTPS)
+    depends_on:
+      - mosquitto
+      - db
+    restart: unless-stopped
+
+volumes:
+  mosquitto_data:
+  db_data:
