@@ -1,0 +1,86 @@
+# ---------- Segredos / configuração local ----------
+.env
+.env.*
+!.env.example
+
+# Certificados e chaves TLS (gerar localmente, nunca versionar)
+*.pem
+*.key
+*.crt
+*.csr
+*.srl
+*.p12
+*.pfx
+certs/
+!certs/.gitkeep
+!certs/README.md
+
+# Ficheiro de passwords do Mosquitto
+mosquitto/config/passwd
+mosquitto/config/*.passwd
+
+# ---------- Dados gerados pelos containers ----------
+mosquitto/data/
+mosquitto/log/
+db_data/
+mysql_data/
+postgres_data/
+data/
+volumes/
+
+# Node-RED (manter flows.json, ignorar runtime)
+nodered/data/node_modules/
+nodered/data/.npm/
+nodered/data/.config.*.json
+nodered/data/.config.*.json.backup
+nodered/data/*.backup
+nodered/data/flows_cred.json
+nodered/data/.flows*.json.backup
+nodered/data/lib/
+node_modules/
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Modelos ML treinados / outputs
+*.pkl
+*.joblib
+models/
+outputs/
+
+# ---------- Logs ----------
+*.log
+logs/
+
+# ---------- IDE / SO ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------- Relatório (LaTeX) ----------
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+
+# Entrega
+*.zip
+
+# Claude Code
+.claude/
