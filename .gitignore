@@ -32,6 +32,7 @@ volumes/
 nodered/data/node_modules/
 nodered/data/context/
 nodered/data/package.json
+nodered/data/.sessions.json
 nodered/data/package-lock.json
 nodered/data/.npm/
 nodered/data/.config.*.json
