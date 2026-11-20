@@ -21,6 +21,13 @@ services:
       - mosquitto_data:/mosquitto/data
     ports:
       - "1883:1883"   # MQTT sobre TLS
+    healthcheck:
+      # Ligação TLS real com autenticação; lê o tópico $SYS (retido) e sai à primeira mensagem
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -p 1883 --cafile /certs/ca.crt -u \"$$MQTT_PROCESSOR_USER\" -P \"$$MQTT_PROCESSOR_PASSWORD\" -t '$$SYS/broker/uptime' -C 1 -W 5 > /dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 5s
     restart: unless-stopped
 
   db:
@@ -46,7 +53,8 @@ services:
       - ./certs/db.key:/certs/server.key:ro
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      # TCP (127.0.0.1) e não socket: durante a inicialização o servidor temporário não abre TCP
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
       retries: 30
@@ -70,6 +78,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import ssl,urllib.request; urllib.request.urlopen('https://ml:5000/health', context=ssl.create_default_context(cafile='/certs/ca.crt'), timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     restart: unless-stopped
 
   processor:
@@ -97,9 +111,9 @@ services:
       db:
         condition: service_healthy
       mosquitto:
-        condition: service_started
+        condition: service_healthy
       ml:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   nodered:

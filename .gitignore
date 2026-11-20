@@ -31,6 +31,8 @@ volumes/
 # Node-RED (manter flows.json, ignorar runtime)
 nodered/data/node_modules/
 nodered/data/context/
+nodered/data/package.json
+nodered/data/package-lock.json
 nodered/data/.npm/
 nodered/data/.config.*.json
 nodered/data/.config.*.json.backup

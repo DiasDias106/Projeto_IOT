@@ -41,6 +41,8 @@ docker-compose.yml        # os 5 serviços da cloud
 .env.example              # variáveis (copiar para .env)
 design-plan.md            # desenho da solução
 scripts/gen-certs.sh      # gera a CA e os certificados TLS
+scripts/gen-env.py        # gera o .env com passwords aleatórias
+scripts/infra_tests.py    # testes de TLS/ACL do broker e contagem de mensagens
 certs/                    # certificados (gerados localmente, não versionados)
 mosquitto/config/         # mosquitto.conf, acl, entrypoint.sh (passwords vêm do .env)
 db/init/                  # esquema SQL e utilizadores (correm na 1.ª inicialização)
@@ -71,10 +73,11 @@ Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros pa
 
 ## Como correr
 
-1. Copiar as variáveis de ambiente e preencher as passwords (instruções no próprio ficheiro):
+1. Criar o `.env` com passwords aleatórias (com o Docker a correr). O script mostra a password do editor Node-RED, que deve ser guardada:
    ```bash
-   cp .env.example .env
+   python scripts/gen-env.py
    ```
+   Em alternativa, `cp .env.example .env` e preencher à mão (instruções no próprio ficheiro).
 2. Gerar a CA e os certificados (Git Bash no Windows):
    ```bash
    bash scripts/gen-certs.sh
@@ -90,6 +93,12 @@ Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros pa
    python client1/publisher.py --speed 60
    ```
 5. Abrir o editor em `https://localhost:1880` e o dashboard em `https://localhost:1880/ui`. O browser avisa sobre o certificado, que é da CA do grupo: aceitar ou importar `certs/ca.crt`.
+
+6. (Opcional) Testar a infraestrutura: TLS, autenticação e ACL do broker; contagem das mensagens do client1:
+   ```bash
+   python scripts/infra_tests.py security
+   python scripts/infra_tests.py listen --expect 19856   # noutro terminal: python client1/publisher.py --speed 0
+   ```
 
 Notas:
 - O esquema e os utilizadores da BD só são criados na primeira inicialização. Depois de os alterar, recriar o volume com `docker compose down -v`. Isto apaga os dados.

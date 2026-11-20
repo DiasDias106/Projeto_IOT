@@ -12,6 +12,8 @@ topic read idc/fc15/status/+
 topic read idc/fc15/trips/started
 topic read idc/fc15/trips/ended
 topic write idc/fc15/internal/#
+# Usado pelo healthcheck do container do broker
+topic read $SYS/broker/uptime
 
 # Node-RED: só lê os tópicos internos
 user nodered
