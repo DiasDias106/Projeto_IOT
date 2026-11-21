@@ -102,7 +102,9 @@ Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros pa
 
 Notas:
 - O esquema e os utilizadores da BD só são criados na primeira inicialização. Depois de os alterar, recriar o volume com `docker compose down -v`. Isto apaga os dados.
-- No Node-RED, os nós MQTT ligam a `mosquitto:1883` com TLS (CA `/certs/ca.crt`) e utilizador `nodered`. Os nós MySQL ligam a `db:3306` com o utilizador `nodered`. As passwords estão nas variáveis de ambiente `MQTT_PASSWORD` e `DB_PASSWORD` do container (usar `${MQTT_PASSWORD}` nos campos).
+- No Node-RED, as credenciais vêm das variáveis de ambiente do container. Nos campos de utilizador e password, escrever `${MQTT_USER}`, `${MQTT_PASSWORD}`, `${DB_USER}` e `${DB_PASSWORD}`. Assim nenhuma password fica nos flows, e cada pessoa usa as do seu `.env`.
+  - **MQTT** (nó `mqtt in`): servidor `mosquitto`, porta `1883`, *Use TLS* ativo, com uma configuração TLS cuja CA é `/certs/ca.crt` e com *Verify server certificate* ativo. Só pode subscrever `idc/fc15/internal/#` (ACL).
+  - **MySQL** (nó `Stackhero-MySQL`): host `db`, porta `3306`, base de dados `bikesharing`, *Encrypt connection* ativo. O SQL vai em `msg.topic`, os parâmetros em `msg.payload` (array ou objeto) e as linhas saem em `msg.payload`. O utilizador `nodered` só tem leitura. O `node-red-node-mysql` não serve, porque não suporta TLS e o MySQL exige-o.
 
 ## Dataset
 
