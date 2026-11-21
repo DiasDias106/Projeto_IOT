@@ -120,6 +120,8 @@ services:
     build: ./nodered
     environment:
       TZ: America/New_York
+      # O Node.js passa a confiar na CA do grupo: TLS verificado para o MySQL e o MQTT
+      NODE_EXTRA_CA_CERTS: /certs/ca.crt
       NODERED_ADMIN_USER: ${NODERED_ADMIN_USER}
       NODERED_ADMIN_PASSWORD_HASH: ${NODERED_ADMIN_PASSWORD_HASH:?defina no .env}
       NODERED_CREDENTIAL_SECRET: ${NODERED_CREDENTIAL_SECRET:?defina no .env}
@@ -135,8 +137,10 @@ services:
     ports:
       - "1880:1880"   # dashboard e editor (HTTPS)
     depends_on:
-      - mosquitto
-      - db
+      mosquitto:
+        condition: service_healthy
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:

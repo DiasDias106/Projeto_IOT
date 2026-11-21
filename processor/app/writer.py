@@ -8,6 +8,9 @@ Regras:
   - trip_started: cria a linha em trips com ended_at = NULL.
   - trip_ended: completa a linha; se não existir (começou antes do stage 1), insere-a já completa.
   - Viagens abertas há mais de OUTLIER_LONG_S (tempo de evento): fechar com quality_flag = NEVER_ENDED.
+  - Durante o bootstrap do stage 1 o cliente MQTT ainda não está ligado (o T1 só arranca depois).
+    Não publicar internal/status nessa fase (por exemplo, só quando self.mqtt.is_connected()), ou
+    ficam cerca de 16 500 mensagens QoS 1 em fila para o Node-RED.
 """
 from __future__ import annotations
 
