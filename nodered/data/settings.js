@@ -20,7 +20,7 @@ module.exports = {
         type: "credentials",
         users: [{
             username: process.env.NODERED_ADMIN_USER || "admin",
-            password: process.env.NODERED_ADMIN_PASSWORD_HASH,
+            password: (process.env.NODERED_ADMIN_PASSWORD_HASH || "").replace(/^'|'$/g, ""),
             permissions: "*",
         }],
     },

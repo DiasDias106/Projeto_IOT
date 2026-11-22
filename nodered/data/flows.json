@@ -1,1 +1,770 @@
-[]
+[
+  {
+    "id": "ui_base_id",
+    "type": "ui_base",
+    "theme": {
+      "name": "theme-dark",
+      "lightTheme": {
+        "default": "#0094CE",
+        "baseColor": "#0094CE",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif",
+        "edited": true,
+        "reset": false
+      },
+      "darkTheme": {
+        "default": "#2b5c8f",
+        "baseColor": "#1f77b4",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif",
+        "edited": true,
+        "reset": false
+      },
+      "customTheme": {
+        "name": "CitiBike Theme",
+        "default": "#4B7930",
+        "baseColor": "#4B7930",
+        "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"
+      },
+      "themeState": {
+        "base-color": {
+          "default": "#2b5c8f",
+          "value": "#1f77b4",
+          "edited": false
+        },
+        "page-titlebar-backgroundColor": {
+          "value": "#154360",
+          "edited": false
+        },
+        "page-backgroundColor": {
+          "value": "#121212",
+          "edited": false
+        },
+        "page-sidebar-backgroundColor": {
+          "value": "#1c2833",
+          "edited": false
+        },
+        "group-textColor": {
+          "value": "#5dade2",
+          "edited": false
+        },
+        "group-borderColor": {
+          "value": "#2c3e50",
+          "edited": false
+        },
+        "group-backgroundColor": {
+          "value": "#1e272c",
+          "edited": false
+        },
+        "widget-textColor": {
+          "value": "#f2f4f4",
+          "edited": false
+        },
+        "widget-backgroundColor": {
+          "value": "#2471a3",
+          "edited": false
+        },
+        "widget-borderColor": {
+          "value": "#2c3e50",
+          "edited": false
+        },
+        "base-font": {
+          "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"
+        }
+      },
+      "angularTheme": {
+        "primary": "indigo",
+        "accents": "blue",
+        "warn": "red",
+        "background": "grey",
+        "palette": "light"
+      }
+    },
+    "site": {
+      "name": "Citi Bike Operations Center",
+      "hideToolbar": "false",
+      "allowSwipe": "false",
+      "lockMenu": "false",
+      "allowTempTheme": "true",
+      "dateFormat": "YYYY-MM-DD",
+      "sizes": {
+        "sx": 48,
+        "sy": 48,
+        "gx": 6,
+        "gy": 6,
+        "cx": 6,
+        "cy": 6,
+        "px": 0,
+        "py": 0
+      }
+    }
+  },
+  {
+    "id": "tab_stage1",
+    "type": "ui_tab",
+    "name": "Stage 1: Historical Analytics",
+    "icon": "dashboard",
+    "order": 1,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "tab_stage2",
+    "type": "ui_tab",
+    "name": "Stage 2: Real-Time Operations",
+    "icon": "show_chart",
+    "order": 2,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "tab_clusters",
+    "type": "ui_tab",
+    "name": "Geospatial & ML Clusters",
+    "icon": "place",
+    "order": 3,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "grp_s1_filters",
+    "type": "ui_group",
+    "name": "1. Date Range & Filter Controls",
+    "tab": "tab_stage1",
+    "order": 1,
+    "disp": true,
+    "width": 6,
+    "collapse": false
+  },
+  {
+    "id": "grp_s1_trends",
+    "type": "ui_group",
+    "name": "2. Trip Volume Trends (Hourly / Daily / Weekly)",
+    "tab": "tab_stage1",
+    "order": 2,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s1_energy_duration",
+    "type": "ui_group",
+    "name": "3. Energy Consumption (kWh) & Duration Distributions",
+    "tab": "tab_stage1",
+    "order": 3,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s1_tod",
+    "type": "ui_group",
+    "name": "4. Four Time-of-Day Windows (Morning, Midday, Evening, Night)",
+    "tab": "tab_stage1",
+    "order": 4,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s1_costs",
+    "type": "ui_group",
+    "name": "5. Trip Cost Trends & Tariff Analysis",
+    "tab": "tab_stage1",
+    "order": 5,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s1_station_user",
+    "type": "ui_group",
+    "name": "6. Station & User-Type Utilization (Member vs. Casual)",
+    "tab": "tab_stage1",
+    "order": 6,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s2_kpis",
+    "type": "ui_group",
+    "name": "Live Operational KPIs (idc/fc15/internal/live_summary)",
+    "tab": "tab_stage2",
+    "order": 1,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s2_fleet",
+    "type": "ui_group",
+    "name": "Real-Time Station Fleet & Dock Occupancy",
+    "tab": "tab_stage2",
+    "order": 2,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_s3_map",
+    "type": "ui_group",
+    "name": "Interactive Geospatial Station Map",
+    "tab": "tab_clusters",
+    "order": 1,
+    "disp": true,
+    "width": 14,
+    "collapse": false
+  },
+  {
+    "id": "grp_s3_profiles",
+    "type": "ui_group",
+    "name": "K-Means Cluster Profiles & Evolution",
+    "tab": "tab_clusters",
+    "order": 2,
+    "disp": true,
+    "width": 10,
+    "collapse": false
+  },
+  {
+    "id": "tls_config_mosquitto",
+    "type": "tls-config",
+    "name": "Group 15 CA Config",
+    "ca": "/certs/ca.crt",
+    "cert": "",
+    "key": "",
+    "verifyservercert": true
+  },
+  {
+    "id": "broker_mosquitto",
+    "type": "mqtt-broker",
+    "name": "Mosquitto TLS",
+    "broker": "mosquitto",
+    "port": "1883",
+    "tls": "tls_config_mosquitto",
+    "clientid": "nodered-operator-ui",
+    "autoConnect": true,
+    "usetls": true,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": ""
+  },
+  {
+    "id": "mysql_bikesharing_db",
+    "type": "Stackhero-MySQL-Server",
+    "name": "Bikesharing MySQL (TLS)",
+    "host": "db",
+    "port": "3306",
+    "tls": true,
+    "database": "bikesharing"
+  },
+  {
+    "id": "flow_s1_id",
+    "type": "tab",
+    "label": "Stage 1: Historical Analytics",
+    "disabled": false,
+    "info": "Workstream for Sprint 2: 6 historical analytics views queried from MySQL."
+  },
+  {
+    "id": "flow_s2_id",
+    "type": "tab",
+    "label": "Stage 2: Real-Time Monitoring",
+    "disabled": false,
+    "info": "Workstream for Sprint 3: Live gauges and real-time station occupancy fed via MQTT."
+  },
+  {
+    "id": "flow_clusters_id",
+    "type": "tab",
+    "label": "Geospatial & ML Clusters",
+    "disabled": false,
+    "info": "Workstream for Sprint 3: Worldmap integration and K-Means cluster profiling."
+  },
+  {
+    "id": "w_s1_filter_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_filters",
+    "name": "Filters Scaffold",
+    "order": 1,
+    "width": 6,
+    "height": 3,
+    "format": "<div style=\"padding:12px; background:#1c2833; border-radius:8px;\">\n  <h4 style=\"margin:0 0 8px 0; color:#5dade2;\"><i class=\"fa fa-filter\"></i> Time Range Selector</h4>\n  <p style=\"font-size:12px; color:#bdc3c7; margin:0;\">Stage 1 Offline Dataset: <b>2024-03-13 to 2024-03-19</b></p>\n  <div style=\"margin-top:10px; display:flex; gap:10px;\">\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Hourly</button>\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Daily</button>\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Weekly</button>\n  </div>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 100,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_s1_trends_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_trends",
+    "name": "Trip Trends Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-line-chart\"></i> Trip Volume Dynamics (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Displays hourly, daily, and weekly ride counts across Jersey City & Hoboken stations from <code>trips</code> table.</p>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 180,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_s1_energy_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_energy_duration",
+    "name": "Energy & Duration Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-bolt\"></i> Energy (kWh) & Duration Histograms (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Visualizes aggregate energy expenditure and trip duration quantiles computed by Haversine metric.</p>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 260,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_s1_tod_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_tod",
+    "name": "Time-of-Day Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-clock-o\"></i> 4 Time-of-Day Windows (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Aggregations partitioned into Morning Rush (07-10), Midday (10-16), Evening Rush (16-19), and Night (19-07).</p>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 340,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_s1_costs_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_costs",
+    "name": "Tariff Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-money\"></i> Tariffs & Cost Breakdown (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Cost trends comparing member pricing vs casual user revenue over time.</p>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 420,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_s1_station_user_card",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_s1_station_user",
+    "name": "Station Utilization Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-bicycle\"></i> Station & User Utilization (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Most active stations, origin-destination pairs, and electric vs classic bike distribution.</p>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 200,
+    "y": 500,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "mysql_query_s1_node",
+    "type": "Stackhero-MySQL",
+    "z": "flow_s1_id",
+    "server": "mysql_bikesharing_db",
+    "name": "Execute SQL Query",
+    "x": 480,
+    "y": 100,
+    "wires": [
+      [
+        "debug_mysql_s1"
+      ]
+    ]
+  },
+  {
+    "id": "debug_mysql_s1",
+    "type": "debug",
+    "z": "flow_s1_id",
+    "name": "SQL Result",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 680,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "mqtt_in_summary_node",
+    "type": "mqtt in",
+    "z": "flow_s2_id",
+    "name": "Sub: live_summary",
+    "topic": "idc/fc15/internal/live_summary",
+    "qos": "1",
+    "datatype": "json",
+    "broker": "broker_mosquitto",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 160,
+    "y": 120,
+    "wires": [
+      [
+        "debug_summary_node",
+        "fn_parse_kpis"
+      ]
+    ]
+  },
+  {
+    "id": "debug_summary_node",
+    "type": "debug",
+    "z": "flow_s2_id",
+    "name": "Live Summary Stream",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 420,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "fn_parse_kpis",
+    "type": "function",
+    "z": "flow_s2_id",
+    "name": "Extract Live KPIs",
+    "func": "// Extrai os campos do live_summary emitido pelo Processor\nif (!msg.payload) return null;\nvar p = msg.payload;\nreturn [\n    { payload: p.active_trips || 0, topic: \"active_trips\" },\n    { payload: p.total_bikes_avail || 0, topic: \"total_bikes_avail\" },\n    { payload: p.total_ebikes_avail || 0, topic: \"total_ebikes_avail\" },\n    { payload: Number((p.stage2_energy_kwh || 0).toFixed(2)), topic: \"stage2_energy_kwh\" },\n    { payload: Number((p.stage2_avg_duration_min || 0).toFixed(1)), topic: \"stage2_avg_duration_min\" }\n];",
+    "outputs": 5,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 410,
+    "y": 180,
+    "wires": [
+      [
+        "gauge_active_trips"
+      ],
+      [
+        "gauge_bikes_avail"
+      ],
+      [
+        "gauge_ebikes_avail"
+      ],
+      [
+        "gauge_energy"
+      ],
+      [
+        "gauge_duration"
+      ]
+    ]
+  },
+  {
+    "id": "gauge_active_trips",
+    "type": "ui_gauge",
+    "z": "flow_s2_id",
+    "name": "Bikes in Use",
+    "group": "grp_s2_kpis",
+    "order": 1,
+    "width": 4,
+    "height": 3,
+    "gtype": "gage",
+    "title": "Bikes Currently in Use",
+    "label": "bikes",
+    "format": "{{value}}",
+    "min": 0,
+    "max": 500,
+    "colors": [
+      "#00b500",
+      "#e6e600",
+      "#ca3838"
+    ],
+    "seg1": "",
+    "seg2": "",
+    "diff": false,
+    "className": "",
+    "x": 700,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "gauge_bikes_avail",
+    "type": "ui_gauge",
+    "z": "flow_s2_id",
+    "name": "Bikes Available",
+    "group": "grp_s2_kpis",
+    "order": 2,
+    "width": 4,
+    "height": 3,
+    "gtype": "gage",
+    "title": "Total Bikes Available",
+    "label": "bikes",
+    "format": "{{value}}",
+    "min": 0,
+    "max": 1500,
+    "colors": [
+      "#ca3838",
+      "#e6e600",
+      "#00b500"
+    ],
+    "seg1": "",
+    "seg2": "",
+    "diff": false,
+    "className": "",
+    "x": 700,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "gauge_ebikes_avail",
+    "type": "ui_gauge",
+    "z": "flow_s2_id",
+    "name": "E-Bikes Available",
+    "group": "grp_s2_kpis",
+    "order": 3,
+    "width": 4,
+    "height": 3,
+    "gtype": "gage",
+    "title": "E-Bikes Available",
+    "label": "e-bikes",
+    "format": "{{value}}",
+    "min": 0,
+    "max": 800,
+    "colors": [
+      "#ca3838",
+      "#e6e600",
+      "#00b500"
+    ],
+    "seg1": "",
+    "seg2": "",
+    "diff": false,
+    "className": "",
+    "x": 700,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "gauge_energy",
+    "type": "ui_text",
+    "z": "flow_s2_id",
+    "group": "grp_s2_kpis",
+    "order": 4,
+    "width": 6,
+    "height": 2,
+    "name": "Cumulative Energy",
+    "label": "Cumulative Stage 2 Energy (kWh):",
+    "format": "{{msg.payload}} kWh",
+    "layout": "row-spread",
+    "className": "",
+    "x": 720,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "gauge_duration",
+    "type": "ui_text",
+    "z": "flow_s2_id",
+    "group": "grp_s2_kpis",
+    "order": 5,
+    "width": 6,
+    "height": 2,
+    "name": "Average Duration",
+    "label": "Stage 2 Average Duration:",
+    "format": "{{msg.payload}} min",
+    "layout": "row-spread",
+    "className": "",
+    "x": 710,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "mqtt_in_station_status",
+    "type": "mqtt in",
+    "z": "flow_s2_id",
+    "name": "Sub: internal/status/+",
+    "topic": "idc/fc15/internal/status/+",
+    "qos": "1",
+    "datatype": "json",
+    "broker": "broker_mosquitto",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 170,
+    "y": 360,
+    "wires": [
+      [
+        "debug_station_status",
+        "w_s2_fleet_card"
+      ]
+    ]
+  },
+  {
+    "id": "debug_station_status",
+    "type": "debug",
+    "z": "flow_s2_id",
+    "name": "Station Status Stream",
+    "active": false,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 430,
+    "y": 320,
+    "wires": []
+  },
+  {
+    "id": "w_s2_fleet_card",
+    "type": "ui_template",
+    "z": "flow_s2_id",
+    "group": "grp_s2_fleet",
+    "name": "Fleet Occupancy Scaffold",
+    "order": 1,
+    "width": 12,
+    "height": 4,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-cubes\"></i> Live Station Fleet & Dock Status</h4>\n  <p style=\"color:#bdc3c7; font-size:12px; margin:8px 0 0 0;\">Subscribed to <code>idc/fc15/internal/status/&lt;station_id&gt;</code>. Updates without polling MySQL.</p>\n  <div style=\"margin-top:12px; color:#2ecc71;\">\n    <i class=\"fa fa-circle\"></i> Real-time telemetry receiver active.\n  </div>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 440,
+    "y": 400,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "worldmap_node_id",
+    "type": "worldmap",
+    "z": "flow_clusters_id",
+    "name": "Citi Bike Station Map",
+    "lat": "40.7282",
+    "lon": "-74.0776",
+    "zoom": "13",
+    "layer": "OSM",
+    "cluster": "",
+    "maxage": "",
+    "usermenu": "show",
+    "layers": "show",
+    "panit": "true",
+    "panlock": "false",
+    "zoomlock": "false",
+    "hiderightclick": "false",
+    "coords": "none",
+    "showgrid": "false",
+    "showruler": "false",
+    "allowFileDrop": "false",
+    "path": "/worldmap",
+    "overwriteFile": "false",
+    "x": 250,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "w_cluster_map_frame",
+    "type": "ui_template",
+    "z": "flow_clusters_id",
+    "group": "grp_s3_map",
+    "name": "Map Embed",
+    "order": 1,
+    "width": 14,
+    "height": 9,
+    "format": "<div style=\"width:100%; height:450px; border-radius:8px; overflow:hidden; border:1px solid #2c3e50;\">\n  <iframe src=\"/worldmap\" style=\"width:100%; height:100%; border:none;\"></iframe>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 230,
+    "y": 240,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "w_cluster_profile_card",
+    "type": "ui_template",
+    "z": "flow_clusters_id",
+    "group": "grp_s3_profiles",
+    "name": "Cluster Evolution Scaffold",
+    "order": 1,
+    "width": 10,
+    "height": 9,
+    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-sitemap\"></i> K-Means Cluster Evolution</h4>\n  <p style=\"color:#bdc3c7; font-size:12px; margin:8px 0;\">Displays the latest station cluster profiles ($k \\in \\{3, 4, 5\\}$) and their behavioral shifts across 6h training cycles.</p>\n  <ul style=\"color:#95a5a6; font-size:12px; padding-left:18px;\">\n    <li>Cluster 0: Residential / Morning Origins</li>\n    <li>Cluster 1: Commercial / Morning Destinations</li>\n    <li>Cluster 2: Balanced / Transit Hubs</li>\n  </ul>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 250,
+    "y": 320,
+    "wires": [
+      []
+    ]
+  }
+]
