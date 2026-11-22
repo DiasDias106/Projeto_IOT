@@ -19,7 +19,7 @@
         "reset": false
       },
       "customTheme": {
-        "name": "CitiBike Theme",
+        "name": "Default Theme",
         "default": "#4B7930",
         "baseColor": "#4B7930",
         "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif"
@@ -79,7 +79,7 @@
       }
     },
     "site": {
-      "name": "Citi Bike Operations Center",
+      "name": "Citi Bike Operations",
       "hideToolbar": "false",
       "allowSwipe": "false",
       "lockMenu": "false",
@@ -98,136 +98,126 @@
     }
   },
   {
-    "id": "tab_stage1",
+    "id": "tab_historical",
     "type": "ui_tab",
-    "name": "Stage 1: Historical Analytics",
-    "icon": "dashboard",
+    "name": "Historical Analytics",
+    "icon": "",
     "order": 1,
     "disabled": false,
     "hidden": false
   },
   {
-    "id": "tab_stage2",
+    "id": "tab_live",
     "type": "ui_tab",
-    "name": "Stage 2: Real-Time Operations",
-    "icon": "show_chart",
+    "name": "Live Operations",
+    "icon": "",
     "order": 2,
     "disabled": false,
     "hidden": false
   },
   {
-    "id": "tab_clusters",
+    "id": "tab_map",
     "type": "ui_tab",
-    "name": "Geospatial & ML Clusters",
-    "icon": "place",
+    "name": "Map",
+    "icon": "",
     "order": 3,
     "disabled": false,
     "hidden": false
   },
   {
-    "id": "grp_s1_filters",
+    "id": "grp_filters",
     "type": "ui_group",
-    "name": "1. Date Range & Filter Controls",
-    "tab": "tab_stage1",
+    "name": "Filters",
+    "tab": "tab_historical",
     "order": 1,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_trends",
+    "type": "ui_group",
+    "name": "Trip Volume",
+    "tab": "tab_historical",
+    "order": 2,
+    "disp": true,
+    "width": 12,
+    "collapse": false
+  },
+  {
+    "id": "grp_energy",
+    "type": "ui_group",
+    "name": "Energy Consumption",
+    "tab": "tab_historical",
+    "order": 3,
     "disp": true,
     "width": 6,
     "collapse": false
   },
   {
-    "id": "grp_s1_trends",
+    "id": "grp_duration",
     "type": "ui_group",
-    "name": "2. Trip Volume Trends (Hourly / Daily / Weekly)",
-    "tab": "tab_stage1",
-    "order": 2,
-    "disp": true,
-    "width": 12,
-    "collapse": false
-  },
-  {
-    "id": "grp_s1_energy_duration",
-    "type": "ui_group",
-    "name": "3. Energy Consumption (kWh) & Duration Distributions",
-    "tab": "tab_stage1",
-    "order": 3,
-    "disp": true,
-    "width": 12,
-    "collapse": false
-  },
-  {
-    "id": "grp_s1_tod",
-    "type": "ui_group",
-    "name": "4. Four Time-of-Day Windows (Morning, Midday, Evening, Night)",
-    "tab": "tab_stage1",
+    "name": "Trip Duration",
+    "tab": "tab_historical",
     "order": 4,
     "disp": true,
-    "width": 12,
+    "width": 6,
     "collapse": false
   },
   {
-    "id": "grp_s1_costs",
+    "id": "grp_tod",
     "type": "ui_group",
-    "name": "5. Trip Cost Trends & Tariff Analysis",
-    "tab": "tab_stage1",
+    "name": "Time of Day",
+    "tab": "tab_historical",
     "order": 5,
     "disp": true,
-    "width": 12,
+    "width": 6,
     "collapse": false
   },
   {
-    "id": "grp_s1_station_user",
+    "id": "grp_revenue",
     "type": "ui_group",
-    "name": "6. Station & User-Type Utilization (Member vs. Casual)",
-    "tab": "tab_stage1",
+    "name": "Revenue",
+    "tab": "tab_historical",
     "order": 6,
     "disp": true,
+    "width": 6,
+    "collapse": false
+  },
+  {
+    "id": "grp_stations",
+    "type": "ui_group",
+    "name": "Top Stations",
+    "tab": "tab_historical",
+    "order": 7,
+    "disp": true,
     "width": 12,
     "collapse": false
   },
   {
-    "id": "grp_s2_kpis",
+    "id": "grp_live_kpis",
     "type": "ui_group",
-    "name": "Live Operational KPIs (idc/fc15/internal/live_summary)",
-    "tab": "tab_stage2",
+    "name": "Live Metrics",
+    "tab": "tab_live",
     "order": 1,
     "disp": true,
     "width": 12,
     "collapse": false
   },
   {
-    "id": "grp_s2_fleet",
+    "id": "grp_map_main",
     "type": "ui_group",
-    "name": "Real-Time Station Fleet & Dock Occupancy",
-    "tab": "tab_stage2",
-    "order": 2,
-    "disp": true,
-    "width": 12,
-    "collapse": false
-  },
-  {
-    "id": "grp_s3_map",
-    "type": "ui_group",
-    "name": "Interactive Geospatial Station Map",
-    "tab": "tab_clusters",
+    "name": "Station Map",
+    "tab": "tab_map",
     "order": 1,
-    "disp": true,
-    "width": 14,
-    "collapse": false
-  },
-  {
-    "id": "grp_s3_profiles",
-    "type": "ui_group",
-    "name": "K-Means Cluster Profiles & Evolution",
-    "tab": "tab_clusters",
-    "order": 2,
-    "disp": true,
-    "width": 10,
+    "disp": false,
+    "width": 12,
     "collapse": false
   },
   {
     "id": "tls_config_mosquitto",
     "type": "tls-config",
-    "name": "Group 15 CA Config",
+    "name": "CA TLS Config",
     "ca": "/certs/ca.crt",
     "cert": "",
     "key": "",
@@ -265,7 +255,7 @@
   {
     "id": "mysql_bikesharing_db",
     "type": "Stackhero-MySQL-Server",
-    "name": "Bikesharing MySQL (TLS)",
+    "name": "MySQL (TLS)",
     "host": "db",
     "port": "3306",
     "tls": true,
@@ -274,180 +264,589 @@
   {
     "id": "flow_s1_id",
     "type": "tab",
-    "label": "Stage 1: Historical Analytics",
+    "label": "Historical Analytics",
     "disabled": false,
-    "info": "Workstream for Sprint 2: 6 historical analytics views queried from MySQL."
+    "info": ""
   },
   {
     "id": "flow_s2_id",
     "type": "tab",
-    "label": "Stage 2: Real-Time Monitoring",
+    "label": "Live Operations",
     "disabled": false,
-    "info": "Workstream for Sprint 3: Live gauges and real-time station occupancy fed via MQTT."
+    "info": ""
   },
   {
     "id": "flow_clusters_id",
     "type": "tab",
-    "label": "Geospatial & ML Clusters",
+    "label": "Map",
     "disabled": false,
-    "info": "Workstream for Sprint 3: Worldmap integration and K-Means cluster profiling."
+    "info": ""
   },
   {
-    "id": "w_s1_filter_card",
+    "id": "inject_s1_boot",
+    "type": "inject",
+    "z": "flow_s1_id",
+    "name": "Init",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 2,
+    "topic": "",
+    "payload": "{\"start_date\": \"2024-03-13 00:00:00\", \"end_date\": \"2024-03-19 23:59:59\", \"granularity\": \"daily\", \"quality_flag\": \"OK\"}",
+    "payloadType": "json",
+    "x": 140,
+    "y": 60,
+    "wires": [
+      [
+        "fn_dispatcher_s1"
+      ]
+    ]
+  },
+  {
+    "id": "w_filter_panel",
     "type": "ui_template",
     "z": "flow_s1_id",
-    "group": "grp_s1_filters",
-    "name": "Filters Scaffold",
+    "group": "grp_filters",
+    "name": "Filter Form",
+    "order": 1,
+    "width": 12,
+    "height": 2,
+    "format": "<div style=\"display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;\">\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Start Date</label>\n    <input type=\"date\" ng-model=\"filter.startDate\" ng-init=\"filter.startDate='2024-03-13'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">End Date</label>\n    <input type=\"date\" ng-model=\"filter.endDate\" ng-init=\"filter.endDate='2024-03-19'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Granularity</label>\n    <select ng-model=\"filter.granularity\" ng-init=\"filter.granularity='daily'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"hourly\">Hourly</option>\n      <option value=\"daily\">Daily</option>\n      <option value=\"weekly\">Weekly</option>\n    </select>\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Quality Flag</label>\n    <select ng-model=\"filter.qualityFlag\" ng-init=\"filter.qualityFlag='OK'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"OK\">OK</option>\n      <option value=\"ALL\">ALL</option>\n      <option value=\"MISSING_END\">MISSING_END</option>\n      <option value=\"OUT_OF_AREA\">OUT_OF_AREA</option>\n      <option value=\"OUTLIER_SHORT\">OUTLIER_SHORT</option>\n      <option value=\"OUTLIER_LONG\">OUTLIER_LONG</option>\n    </select>\n  </div>\n  <div>\n    <button class=\"md-raised md-button md-primary\" ng-click=\"sendFilter()\" style=\"margin:0; background:#1f77b4; color:#fff;\">\n      Apply\n    </button>\n  </div>\n</div>\n<script>\n(function(scope) {\n  scope.filter = scope.filter || {\n    startDate: '2024-03-13',\n    endDate: '2024-03-19',\n    granularity: 'daily',\n    qualityFlag: 'OK'\n  };\n  scope.sendFilter = function() {\n    scope.send({\n      payload: {\n        start_date: scope.filter.startDate + ' 00:00:00',\n        end_date: scope.filter.endDate + ' 23:59:59',\n        granularity: scope.filter.granularity,\n        quality_flag: scope.filter.qualityFlag\n      }\n    });\n  };\n})(scope);\n</script>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 160,
+    "y": 140,
+    "wires": [
+      [
+        "fn_dispatcher_s1"
+      ]
+    ]
+  },
+  {
+    "id": "fn_dispatcher_s1",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Dispatch Queries",
+    "func": "var p = msg.payload || {};\nvar start_date = p.start_date || '2024-03-13 00:00:00';\nvar end_date = p.end_date || '2024-03-19 23:59:59';\nvar quality_flag = p.quality_flag || 'OK';\nvar granularity = p.granularity || 'daily';\n\nvar params = {\n    start_date: start_date,\n    end_date: end_date,\n    quality_flag: quality_flag\n};\n\nvar time_fmt = \"%Y-%m-%d\";\nif (granularity === 'hourly') time_fmt = \"%Y-%m-%d %H:00\";\nelse if (granularity === 'weekly') time_fmt = \"%Y-%U\";\n\nvar q1_sql = \"SELECT DATE_FORMAT(started_at, '\" + time_fmt + \"') AS time_bucket, \" +\n    \"member_casual, COUNT(*) AS trip_count \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_bucket, member_casual \" +\n    \"ORDER BY time_bucket ASC;\";\n\nvar q2_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_energy_kwh, \" +\n    \"ROUND(COALESCE(AVG(energy_kwh), 0), 3) AS avg_energy_kwh, \" +\n    \"COUNT(*) AS ebike_trips \" +\n    \"FROM trips \" +\n    \"WHERE rideable_type = 'electric_bike' \" +\n    \"AND started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date \" +\n    \"ORDER BY trip_date ASC;\";\n\nvar q3_sql = \"SELECT member_casual, COUNT(*) AS total_trips, \" +\n    \"ROUND(COALESCE(SUM(duration_s), 0) / 3600.0, 1) AS total_hours, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"SUM(CASE WHEN duration_s < 300 THEN 1 ELSE 0 END) AS under_5m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 300 AND 899 THEN 1 ELSE 0 END) AS m5_to_15m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 900 AND 1799 THEN 1 ELSE 0 END) AS m15_to_30m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 1800 AND 3599 THEN 1 ELSE 0 END) AS m30_to_60m, \" +\n    \"SUM(CASE WHEN duration_s >= 3600 THEN 1 ELSE 0 END) AS over_60m \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY member_casual;\";\n\nvar q4_sql = \"SELECT \" +\n    \"CASE \" +\n    \"  WHEN TIME(started_at) BETWEEN '07:00:00' AND '09:59:59' THEN 'Morning (07-10h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '10:00:00' AND '15:59:59' THEN 'Midday (10-16h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '16:00:00' AND '18:59:59' THEN 'Evening (16-19h)' \" +\n    \"  ELSE 'Night (19-07h)' \" +\n    \"END AS time_window, \" +\n    \"COUNT(*) AS trip_count, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_kwh \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_window \" +\n    \"ORDER BY time_window ASC;\";\n\nvar q5_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, member_casual, \" +\n    \"ROUND(COALESCE(SUM(cost_usd), 0), 2) AS total_revenue_usd, \" +\n    \"ROUND(COALESCE(AVG(cost_usd), 0), 2) AS avg_cost_usd \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date, member_casual \" +\n    \"ORDER BY trip_date ASC, member_casual;\";\n\nvar q6_sql = \"SELECT COALESCE(start_station_name, 'Unknown Station') AS station_name, \" +\n    \"COUNT(*) AS departures, \" +\n    \"SUM(CASE WHEN rideable_type = 'electric_bike' THEN 1 ELSE 0 END) AS ebike_departures, \" +\n    \"SUM(CASE WHEN member_casual = 'member' THEN 1 ELSE 0 END) AS member_departures \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"AND start_station_name IS NOT NULL \" +\n    \"GROUP BY start_station_name \" +\n    \"ORDER BY departures DESC \" +\n    \"LIMIT 10;\";\n\nreturn [\n    { topic: q1_sql, payload: params },\n    { topic: q2_sql, payload: params },\n    { topic: q3_sql, payload: params },\n    { topic: q4_sql, payload: params },\n    { topic: q5_sql, payload: params },\n    { topic: q6_sql, payload: params }\n];",
+    "outputs": 6,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 420,
+    "y": 140,
+    "wires": [
+      [
+        "sql_v1_trends"
+      ],
+      [
+        "sql_v2_energy"
+      ],
+      [
+        "sql_v3_duration"
+      ],
+      [
+        "sql_v4_tod"
+      ],
+      [
+        "sql_v5_costs"
+      ],
+      [
+        "sql_v6_stations"
+      ]
+    ]
+  },
+  {
+    "id": "sql_v1_trends",
+    "type": "Stackhero-MySQL",
+    "z": "flow_s1_id",
+    "server": "mysql_bikesharing_db",
+    "name": "SQL: Volume",
+    "x": 680,
+    "y": 80,
+    "wires": [
+      [
+        "fn_format_v1_trends"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_v1_trends",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Format Volume",
+    "func": "var rows = msg.payload || [];\nif (!Array.isArray(rows) || rows.length === 0) {\n    return {\n        payload: [{\n            series: [\"Member\", \"Casual\"],\n            data: [[0], [0]],\n            labels: [\"No data\"]\n        }]\n    };\n}\n\nvar bucketsSet = new Set();\nvar memberMap = {};\nvar casualMap = {};\n\nrows.forEach(function(r) {\n    var b = r.time_bucket;\n    bucketsSet.add(b);\n    if (r.member_casual === 'member') memberMap[b] = r.trip_count;\n    else if (r.member_casual === 'casual') casualMap[b] = r.trip_count;\n});\n\nvar sortedBuckets = Array.from(bucketsSet).sort();\nvar memberData = [];\nvar casualData = [];\n\nsortedBuckets.forEach(function(b) {\n    memberData.push(memberMap[b] || 0);\n    casualData.push(casualMap[b] || 0);\n});\n\nreturn {\n    payload: [{\n        series: [\"Member\", \"Casual\"],\n        data: [memberData, casualData],\n        labels: sortedBuckets\n    }]\n};",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 80,
+    "wires": [
+      [
+        "chart_v1_trends"
+      ]
+    ]
+  },
+  {
+    "id": "chart_v1_trends",
+    "type": "ui_chart",
+    "z": "flow_s1_id",
+    "name": "Volume Chart",
+    "group": "grp_trends",
+    "order": 1,
+    "width": 12,
+    "height": 6,
+    "label": "",
+    "chartType": "line",
+    "legend": "true",
+    "xformat": "auto",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "dot": false,
+    "ymin": "0",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": false,
+    "useUTC": false,
+    "colors": [
+      "#1f77b4",
+      "#ff7f0e",
+      "#2ca02c",
+      "#d62728",
+      "#9467bd",
+      "#8c564b",
+      "#e377c2",
+      "#7f7f7f",
+      "#bcbd22"
+    ],
+    "useOldStyle": false,
+    "outputs": 1,
+    "className": "",
+    "x": 1150,
+    "y": 80,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "sql_v2_energy",
+    "type": "Stackhero-MySQL",
+    "z": "flow_s1_id",
+    "server": "mysql_bikesharing_db",
+    "name": "SQL: Energy",
+    "x": 680,
+    "y": 140,
+    "wires": [
+      [
+        "fn_format_v2_energy"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_v2_energy",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Format Energy",
+    "func": "var rows = msg.payload || [];\nvar labels = [];\nvar energyData = [];\nvar totalKwh = 0;\nvar totalEbikeTrips = 0;\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        labels.push(r.trip_date);\n        var kwh = Number(r.total_energy_kwh || 0);\n        energyData.push(kwh);\n        totalKwh += kwh;\n        totalEbikeTrips += Number(r.ebike_trips || 0);\n    });\n} else {\n    labels = [\"No Data\"];\n    energyData = [0];\n}\n\nvar avgKwh = totalEbikeTrips > 0 ? (totalKwh / totalEbikeTrips).toFixed(3) : \"0.000\";\n\nvar kpiCard = {\n    payload: \"Total: \" + totalKwh.toFixed(1) + \" kWh | E-Bikes: \" + totalEbikeTrips + \" | Avg: \" + avgKwh + \" kWh/trip\"\n};\n\nvar chartPayload = {\n    payload: [{\n        series: [\"kWh\"],\n        data: [energyData],\n        labels: labels\n    }]\n};\n\nreturn [kpiCard, chartPayload];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 140,
+    "wires": [
+      [
+        "kpi_v2_energy"
+      ],
+      [
+        "chart_v2_energy"
+      ]
+    ]
+  },
+  {
+    "id": "kpi_v2_energy",
+    "type": "ui_text",
+    "z": "flow_s1_id",
+    "group": "grp_energy",
+    "name": "Energy Summary",
     "order": 1,
     "width": 6,
-    "height": 3,
-    "format": "<div style=\"padding:12px; background:#1c2833; border-radius:8px;\">\n  <h4 style=\"margin:0 0 8px 0; color:#5dade2;\"><i class=\"fa fa-filter\"></i> Time Range Selector</h4>\n  <p style=\"font-size:12px; color:#bdc3c7; margin:0;\">Stage 1 Offline Dataset: <b>2024-03-13 to 2024-03-19</b></p>\n  <div style=\"margin-top:10px; display:flex; gap:10px;\">\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Hourly</button>\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Daily</button>\n    <button class=\"md-raised md-button md-primary\" style=\"background:#2471a3; color:white;\">Weekly</button>\n  </div>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
+    "height": 1,
+    "label": "",
+    "format": "{{msg.payload}}",
+    "layout": "col-center",
     "className": "",
-    "x": 200,
-    "y": 100,
+    "x": 1150,
+    "y": 120,
     "wires": [
       []
     ]
   },
   {
-    "id": "w_s1_trends_card",
-    "type": "ui_template",
+    "id": "chart_v2_energy",
+    "type": "ui_chart",
     "z": "flow_s1_id",
-    "group": "grp_s1_trends",
-    "name": "Trip Trends Scaffold",
-    "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-line-chart\"></i> Trip Volume Dynamics (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Displays hourly, daily, and weekly ride counts across Jersey City & Hoboken stations from <code>trips</code> table.</p>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
+    "name": "Energy Chart",
+    "group": "grp_energy",
+    "order": 2,
+    "width": 6,
+    "height": 5,
+    "label": "",
+    "chartType": "bar",
+    "legend": "false",
+    "xformat": "auto",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "dot": false,
+    "ymin": "0",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": true,
+    "useUTC": false,
+    "colors": [
+      "#2ecc71"
+    ],
+    "useOldStyle": false,
+    "outputs": 1,
     "className": "",
-    "x": 200,
-    "y": 180,
+    "x": 1150,
+    "y": 160,
     "wires": [
       []
     ]
   },
   {
-    "id": "w_s1_energy_card",
-    "type": "ui_template",
+    "id": "sql_v3_duration",
+    "type": "Stackhero-MySQL",
     "z": "flow_s1_id",
-    "group": "grp_s1_energy_duration",
-    "name": "Energy & Duration Scaffold",
+    "server": "mysql_bikesharing_db",
+    "name": "SQL: Duration",
+    "x": 680,
+    "y": 200,
+    "wires": [
+      [
+        "fn_format_v3_duration"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_v3_duration",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Format Duration",
+    "func": "var rows = msg.payload || [];\nvar totalTrips = 0;\nvar totalHours = 0;\nvar b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0;\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        totalTrips += Number(r.total_trips || 0);\n        totalHours += Number(r.total_hours || 0);\n        b1 += Number(r.under_5m || 0);\n        b2 += Number(r.m5_to_15m || 0);\n        b3 += Number(r.m15_to_30m || 0);\n        b4 += Number(r.m30_to_60m || 0);\n        b5 += Number(r.over_60m || 0);\n    });\n}\n\nvar avgDuration = totalTrips > 0 ? ((totalHours * 60) / totalTrips).toFixed(1) : \"0.0\";\n\nvar kpiCard = {\n    payload: \"Total: \" + totalHours.toFixed(1) + \" h | Avg: \" + avgDuration + \" min | Trips: \" + totalTrips\n};\n\nvar chartPayload = {\n    payload: [{\n        series: [\"Trips\"],\n        data: [[b1, b2, b3, b4, b5]],\n        labels: [\"< 5m\", \"5-15m\", \"15-30m\", \"30-60m\", \"> 60m\"]\n    }]\n};\n\nreturn [kpiCard, chartPayload];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 200,
+    "wires": [
+      [
+        "kpi_v3_duration"
+      ],
+      [
+        "chart_v3_duration"
+      ]
+    ]
+  },
+  {
+    "id": "kpi_v3_duration",
+    "type": "ui_text",
+    "z": "flow_s1_id",
+    "group": "grp_duration",
+    "name": "Duration Summary",
     "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-bolt\"></i> Energy (kWh) & Duration Histograms (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Visualizes aggregate energy expenditure and trip duration quantiles computed by Haversine metric.</p>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
+    "width": 6,
+    "height": 1,
+    "label": "",
+    "format": "{{msg.payload}}",
+    "layout": "col-center",
     "className": "",
-    "x": 200,
-    "y": 260,
+    "x": 1150,
+    "y": 200,
     "wires": [
       []
     ]
   },
   {
-    "id": "w_s1_tod_card",
-    "type": "ui_template",
+    "id": "chart_v3_duration",
+    "type": "ui_chart",
     "z": "flow_s1_id",
-    "group": "grp_s1_tod",
-    "name": "Time-of-Day Scaffold",
-    "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-clock-o\"></i> 4 Time-of-Day Windows (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Aggregations partitioned into Morning Rush (07-10), Midday (10-16), Evening Rush (16-19), and Night (19-07).</p>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
+    "name": "Duration Chart",
+    "group": "grp_duration",
+    "order": 2,
+    "width": 6,
+    "height": 5,
+    "label": "",
+    "chartType": "bar",
+    "legend": "false",
+    "xformat": "auto",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "dot": false,
+    "ymin": "0",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": true,
+    "useUTC": false,
+    "colors": [
+      "#f39c12"
+    ],
+    "useOldStyle": false,
+    "outputs": 1,
     "className": "",
-    "x": 200,
+    "x": 1150,
+    "y": 240,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "sql_v4_tod",
+    "type": "Stackhero-MySQL",
+    "z": "flow_s1_id",
+    "server": "mysql_bikesharing_db",
+    "name": "SQL: Time of Day",
+    "x": 680,
+    "y": 280,
+    "wires": [
+      [
+        "fn_format_v4_tod"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_v4_tod",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Format Time of Day",
+    "func": "var rows = msg.payload || [];\nvar labels = [\n    \"Morning (07-10h)\",\n    \"Midday (10-16h)\",\n    \"Evening (16-19h)\",\n    \"Night (19-07h)\"\n];\nvar counts = [0, 0, 0, 0];\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        var w = r.time_window || '';\n        var cnt = Number(r.trip_count || 0);\n        if (w.indexOf('Morning') !== -1) counts[0] = cnt;\n        else if (w.indexOf('Midday') !== -1) counts[1] = cnt;\n        else if (w.indexOf('Evening') !== -1) counts[2] = cnt;\n        else if (w.indexOf('Night') !== -1) counts[3] = cnt;\n    });\n}\n\nreturn {\n    payload: [{\n        series: [\"Trips\"],\n        data: counts,\n        labels: labels\n    }]\n};",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 280,
+    "wires": [
+      [
+        "chart_v4_tod"
+      ]
+    ]
+  },
+  {
+    "id": "chart_v4_tod",
+    "type": "ui_chart",
+    "z": "flow_s1_id",
+    "name": "Time of Day Chart",
+    "group": "grp_tod",
+    "order": 1,
+    "width": 6,
+    "height": 6,
+    "label": "",
+    "chartType": "pie",
+    "legend": "true",
+    "xformat": "auto",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "dot": false,
+    "ymin": "",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": false,
+    "useUTC": false,
+    "colors": [
+      "#e74c3c",
+      "#3498db",
+      "#e67e22",
+      "#34495e"
+    ],
+    "useOldStyle": false,
+    "outputs": 1,
+    "className": "",
+    "x": 1150,
+    "y": 280,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "sql_v5_costs",
+    "type": "Stackhero-MySQL",
+    "z": "flow_s1_id",
+    "server": "mysql_bikesharing_db",
+    "name": "SQL: Revenue",
+    "x": 680,
+    "y": 360,
+    "wires": [
+      [
+        "fn_format_v5_costs"
+      ]
+    ]
+  },
+  {
+    "id": "fn_format_v5_costs",
+    "type": "function",
+    "z": "flow_s1_id",
+    "name": "Format Revenue",
+    "func": "var rows = msg.payload || [];\nvar datesSet = new Set();\nvar memberMap = {};\nvar casualMap = {};\nvar totalMemberRev = 0;\nvar totalCasualRev = 0;\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        var d = r.trip_date;\n        datesSet.add(d);\n        var rev = Number(r.total_revenue_usd || 0);\n        if (r.member_casual === 'member') {\n            memberMap[d] = rev;\n            totalMemberRev += rev;\n        } else if (r.member_casual === 'casual') {\n            casualMap[d] = rev;\n            totalCasualRev += rev;\n        }\n    });\n}\n\nvar sortedDates = Array.from(datesSet).sort();\nvar memberRevs = [];\nvar casualRevs = [];\n\nsortedDates.forEach(function(d) {\n    memberRevs.push(memberMap[d] || 0);\n    casualRevs.push(casualMap[d] || 0);\n});\n\nvar totalRev = totalMemberRev + totalCasualRev;\n\nvar kpiCard = {\n    payload: \"Total: $\" + totalRev.toFixed(2) + \" | Member: $\" + totalMemberRev.toFixed(2) + \" | Casual: $\" + totalCasualRev.toFixed(2)\n};\n\nvar chartPayload = {\n    payload: [{\n        series: [\"Member ($)\", \"Casual ($)\"],\n        data: [memberRevs, casualRevs],\n        labels: sortedDates.length > 0 ? sortedDates : [\"No Data\"]\n    }]\n};\n\nreturn [kpiCard, chartPayload];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 360,
+    "wires": [
+      [
+        "kpi_v5_costs"
+      ],
+      [
+        "chart_v5_costs"
+      ]
+    ]
+  },
+  {
+    "id": "kpi_v5_costs",
+    "type": "ui_text",
+    "z": "flow_s1_id",
+    "group": "grp_revenue",
+    "name": "Revenue Summary",
+    "order": 1,
+    "width": 6,
+    "height": 1,
+    "label": "",
+    "format": "{{msg.payload}}",
+    "layout": "col-center",
+    "className": "",
+    "x": 1150,
     "y": 340,
     "wires": [
       []
     ]
   },
   {
-    "id": "w_s1_costs_card",
-    "type": "ui_template",
+    "id": "chart_v5_costs",
+    "type": "ui_chart",
     "z": "flow_s1_id",
-    "group": "grp_s1_costs",
-    "name": "Tariff Scaffold",
-    "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-money\"></i> Tariffs & Cost Breakdown (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Cost trends comparing member pricing vs casual user revenue over time.</p>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
+    "name": "Revenue Chart",
+    "group": "grp_revenue",
+    "order": 2,
+    "width": 6,
+    "height": 5,
+    "label": "",
+    "chartType": "bar",
+    "legend": "true",
+    "xformat": "auto",
+    "interpolate": "linear",
+    "nodata": "No data",
+    "dot": false,
+    "ymin": "0",
+    "ymax": "",
+    "removeOlder": 1,
+    "removeOlderPoints": "",
+    "removeOlderUnit": "3600",
+    "cutout": 0,
+    "useOneColor": false,
+    "useUTC": false,
+    "colors": [
+      "#1f77b4",
+      "#e67e22"
+    ],
+    "useOldStyle": false,
+    "outputs": 1,
     "className": "",
-    "x": 200,
-    "y": 420,
+    "x": 1150,
+    "y": 380,
     "wires": [
       []
     ]
   },
   {
-    "id": "w_s1_station_user_card",
-    "type": "ui_template",
-    "z": "flow_s1_id",
-    "group": "grp_s1_station_user",
-    "name": "Station Utilization Scaffold",
-    "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px; text-align:center;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-bicycle\"></i> Station & User Utilization (Sprint 2 View)</h4>\n  <p style=\"color:#95a5a6; font-size:13px; margin:8px 0 0 0;\">Most active stations, origin-destination pairs, and electric vs classic bike distribution.</p>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
-    "className": "",
-    "x": 200,
-    "y": 500,
-    "wires": [
-      []
-    ]
-  },
-  {
-    "id": "mysql_query_s1_node",
+    "id": "sql_v6_stations",
     "type": "Stackhero-MySQL",
     "z": "flow_s1_id",
     "server": "mysql_bikesharing_db",
-    "name": "Execute SQL Query",
-    "x": 480,
-    "y": 100,
+    "name": "SQL: Top Stations",
+    "x": 680,
+    "y": 440,
     "wires": [
       [
-        "debug_mysql_s1"
+        "fn_format_v6_stations"
       ]
     ]
   },
   {
-    "id": "debug_mysql_s1",
-    "type": "debug",
+    "id": "fn_format_v6_stations",
+    "type": "function",
     "z": "flow_s1_id",
-    "name": "SQL Result",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "payload",
-    "targetType": "msg",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 680,
-    "y": 100,
-    "wires": []
+    "name": "Format Top Stations",
+    "func": "var rows = msg.payload || [];\nif (!Array.isArray(rows) || rows.length === 0) {\n    return {\n        payload: \"<p style='color:#888; font-size:12px; margin:0;'>No data</p>\"\n    };\n}\n\nvar html = \"<table style='width:100%; border-collapse:collapse; font-size:12px; color:#ddd;'>\";\nhtml += \"<tr style='border-bottom:1px solid #444; color:#aaa; text-align:left;'>\";\nhtml += \"<th style='padding:6px;'>#</th>\";\nhtml += \"<th style='padding:6px;'>Station</th>\";\nhtml += \"<th style='padding:6px; text-align:right;'>Departures</th>\";\nhtml += \"<th style='padding:6px; text-align:right;'>E-Bike</th>\";\nhtml += \"<th style='padding:6px; text-align:right;'>Member</th>\";\nhtml += \"</tr>\";\n\nrows.forEach(function(r, idx) {\n    var total = Number(r.departures || 0);\n    var ebikes = Number(r.ebike_departures || 0);\n    var members = Number(r.member_departures || 0);\n    var ebikePct = total > 0 ? ((ebikes / total) * 100).toFixed(0) + \"%\" : \"0%\";\n    var memberPct = total > 0 ? ((members / total) * 100).toFixed(0) + \"%\" : \"0%\";\n\n    html += \"<tr style='border-bottom:1px solid #282828;'>\";\n    html += \"<td style='padding:6px; color:#888;'>\" + (idx + 1) + \"</td>\";\n    html += \"<td style='padding:6px; font-weight:500;'>\" + r.station_name + \"</td>\";\n    html += \"<td style='padding:6px; text-align:right;'>\" + total + \"</td>\";\n    html += \"<td style='padding:6px; text-align:right;'>\" + ebikes + \" (\" + ebikePct + \")</td>\";\n    html += \"<td style='padding:6px; text-align:right;'>\" + members + \" (\" + memberPct + \")</td>\";\n    html += \"</tr>\";\n});\n\nhtml += \"</table>\";\n\nreturn { payload: html };",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 440,
+    "wires": [
+      [
+        "table_v6_stations"
+      ]
+    ]
+  },
+  {
+    "id": "table_v6_stations",
+    "type": "ui_template",
+    "z": "flow_s1_id",
+    "group": "grp_stations",
+    "name": "Stations Table",
+    "order": 1,
+    "width": 12,
+    "height": 6,
+    "format": "<div style='overflow-x:auto;' ng-bind-html='msg.payload'></div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": false,
+    "templateScope": "local",
+    "className": "",
+    "x": 1150,
+    "y": 440,
+    "wires": [
+      []
+    ]
   },
   {
     "id": "mqtt_in_summary_node",
@@ -466,34 +865,16 @@
     "y": 120,
     "wires": [
       [
-        "debug_summary_node",
         "fn_parse_kpis"
       ]
     ]
   },
   {
-    "id": "debug_summary_node",
-    "type": "debug",
-    "z": "flow_s2_id",
-    "name": "Live Summary Stream",
-    "active": true,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "payload",
-    "targetType": "msg",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 420,
-    "y": 80,
-    "wires": []
-  },
-  {
     "id": "fn_parse_kpis",
     "type": "function",
     "z": "flow_s2_id",
-    "name": "Extract Live KPIs",
-    "func": "// Extrai os campos do live_summary emitido pelo Processor\nif (!msg.payload) return null;\nvar p = msg.payload;\nreturn [\n    { payload: p.active_trips || 0, topic: \"active_trips\" },\n    { payload: p.total_bikes_avail || 0, topic: \"total_bikes_avail\" },\n    { payload: p.total_ebikes_avail || 0, topic: \"total_ebikes_avail\" },\n    { payload: Number((p.stage2_energy_kwh || 0).toFixed(2)), topic: \"stage2_energy_kwh\" },\n    { payload: Number((p.stage2_avg_duration_min || 0).toFixed(1)), topic: \"stage2_avg_duration_min\" }\n];",
+    "name": "Extract KPIs",
+    "func": "if (!msg.payload) return null;\nvar p = msg.payload;\nreturn [\n    { payload: p.active_trips || 0, topic: \"active_trips\" },\n    { payload: p.total_bikes_avail || 0, topic: \"total_bikes_avail\" },\n    { payload: p.total_ebikes_avail || 0, topic: \"total_ebikes_avail\" },\n    { payload: Number((p.stage2_energy_kwh || 0).toFixed(2)), topic: \"stage2_energy_kwh\" },\n    { payload: Number((p.stage2_avg_duration_min || 0).toFixed(1)), topic: \"stage2_avg_duration_min\" }\n];",
     "outputs": 5,
     "timeout": 0,
     "noerr": 0,
@@ -525,13 +906,13 @@
     "type": "ui_gauge",
     "z": "flow_s2_id",
     "name": "Bikes in Use",
-    "group": "grp_s2_kpis",
+    "group": "grp_live_kpis",
     "order": 1,
     "width": 4,
     "height": 3,
     "gtype": "gage",
-    "title": "Bikes Currently in Use",
-    "label": "bikes",
+    "title": "Bikes in Use",
+    "label": "",
     "format": "{{value}}",
     "min": 0,
     "max": 500,
@@ -553,13 +934,13 @@
     "type": "ui_gauge",
     "z": "flow_s2_id",
     "name": "Bikes Available",
-    "group": "grp_s2_kpis",
+    "group": "grp_live_kpis",
     "order": 2,
     "width": 4,
     "height": 3,
     "gtype": "gage",
-    "title": "Total Bikes Available",
-    "label": "bikes",
+    "title": "Bikes Available",
+    "label": "",
     "format": "{{value}}",
     "min": 0,
     "max": 1500,
@@ -581,13 +962,13 @@
     "type": "ui_gauge",
     "z": "flow_s2_id",
     "name": "E-Bikes Available",
-    "group": "grp_s2_kpis",
+    "group": "grp_live_kpis",
     "order": 3,
     "width": 4,
     "height": 3,
     "gtype": "gage",
     "title": "E-Bikes Available",
-    "label": "e-bikes",
+    "label": "",
     "format": "{{value}}",
     "min": 0,
     "max": 800,
@@ -608,12 +989,12 @@
     "id": "gauge_energy",
     "type": "ui_text",
     "z": "flow_s2_id",
-    "group": "grp_s2_kpis",
+    "group": "grp_live_kpis",
     "order": 4,
     "width": 6,
     "height": 2,
     "name": "Cumulative Energy",
-    "label": "Cumulative Stage 2 Energy (kWh):",
+    "label": "Cumulative Energy:",
     "format": "{{msg.payload}} kWh",
     "layout": "row-spread",
     "className": "",
@@ -625,12 +1006,12 @@
     "id": "gauge_duration",
     "type": "ui_text",
     "z": "flow_s2_id",
-    "group": "grp_s2_kpis",
+    "group": "grp_live_kpis",
     "order": 5,
     "width": 6,
     "height": 2,
     "name": "Average Duration",
-    "label": "Stage 2 Average Duration:",
+    "label": "Average Duration:",
     "format": "{{msg.payload}} min",
     "layout": "row-spread",
     "className": "",
@@ -639,70 +1020,10 @@
     "wires": []
   },
   {
-    "id": "mqtt_in_station_status",
-    "type": "mqtt in",
-    "z": "flow_s2_id",
-    "name": "Sub: internal/status/+",
-    "topic": "idc/fc15/internal/status/+",
-    "qos": "1",
-    "datatype": "json",
-    "broker": "broker_mosquitto",
-    "nl": false,
-    "rap": true,
-    "rh": 0,
-    "inputs": 0,
-    "x": 170,
-    "y": 360,
-    "wires": [
-      [
-        "debug_station_status",
-        "w_s2_fleet_card"
-      ]
-    ]
-  },
-  {
-    "id": "debug_station_status",
-    "type": "debug",
-    "z": "flow_s2_id",
-    "name": "Station Status Stream",
-    "active": false,
-    "tosidebar": true,
-    "console": false,
-    "tostatus": false,
-    "complete": "payload",
-    "targetType": "msg",
-    "statusVal": "",
-    "statusType": "auto",
-    "x": 430,
-    "y": 320,
-    "wires": []
-  },
-  {
-    "id": "w_s2_fleet_card",
-    "type": "ui_template",
-    "z": "flow_s2_id",
-    "group": "grp_s2_fleet",
-    "name": "Fleet Occupancy Scaffold",
-    "order": 1,
-    "width": 12,
-    "height": 4,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-cubes\"></i> Live Station Fleet & Dock Status</h4>\n  <p style=\"color:#bdc3c7; font-size:12px; margin:8px 0 0 0;\">Subscribed to <code>idc/fc15/internal/status/&lt;station_id&gt;</code>. Updates without polling MySQL.</p>\n  <div style=\"margin-top:12px; color:#2ecc71;\">\n    <i class=\"fa fa-circle\"></i> Real-time telemetry receiver active.\n  </div>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
-    "className": "",
-    "x": 440,
-    "y": 400,
-    "wires": [
-      []
-    ]
-  },
-  {
     "id": "worldmap_node_id",
     "type": "worldmap",
     "z": "flow_clusters_id",
-    "name": "Citi Bike Station Map",
+    "name": "Station Map",
     "lat": "40.7282",
     "lon": "-74.0776",
     "zoom": "13",
@@ -729,12 +1050,12 @@
     "id": "w_cluster_map_frame",
     "type": "ui_template",
     "z": "flow_clusters_id",
-    "group": "grp_s3_map",
+    "group": "grp_map_main",
     "name": "Map Embed",
     "order": 1,
-    "width": 14,
-    "height": 9,
-    "format": "<div style=\"width:100%; height:450px; border-radius:8px; overflow:hidden; border:1px solid #2c3e50;\">\n  <iframe src=\"/worldmap\" style=\"width:100%; height:100%; border:none;\"></iframe>\n</div>",
+    "width": 12,
+    "height": 11,
+    "format": "<div style=\"width:100%; height:550px; border-radius:4px; overflow:hidden; border:1px solid #333;\">\n  <iframe src=\"/worldmap\" style=\"width:100%; height:100%; border:none;\"></iframe>\n</div>",
     "storeOutMessages": false,
     "fwdInMessages": false,
     "resendOnRefresh": false,
@@ -742,27 +1063,6 @@
     "className": "",
     "x": 230,
     "y": 240,
-    "wires": [
-      []
-    ]
-  },
-  {
-    "id": "w_cluster_profile_card",
-    "type": "ui_template",
-    "z": "flow_clusters_id",
-    "group": "grp_s3_profiles",
-    "name": "Cluster Evolution Scaffold",
-    "order": 1,
-    "width": 10,
-    "height": 9,
-    "format": "<div style=\"padding:16px; background:#1e272c; border:1px dashed #2c3e50; border-radius:8px;\">\n  <h4 style=\"color:#5dade2; margin:0;\"><i class=\"fa fa-sitemap\"></i> K-Means Cluster Evolution</h4>\n  <p style=\"color:#bdc3c7; font-size:12px; margin:8px 0;\">Displays the latest station cluster profiles ($k \\in \\{3, 4, 5\\}$) and their behavioral shifts across 6h training cycles.</p>\n  <ul style=\"color:#95a5a6; font-size:12px; padding-left:18px;\">\n    <li>Cluster 0: Residential / Morning Origins</li>\n    <li>Cluster 1: Commercial / Morning Destinations</li>\n    <li>Cluster 2: Balanced / Transit Hubs</li>\n  </ul>\n</div>",
-    "storeOutMessages": false,
-    "fwdInMessages": false,
-    "resendOnRefresh": false,
-    "templateScope": "local",
-    "className": "",
-    "x": 250,
-    "y": 320,
     "wires": [
       []
     ]
