@@ -19,6 +19,7 @@ import math
 import os
 import random
 import subprocess
+import ssl
 import sys
 import time
 from pathlib import Path
@@ -171,7 +172,7 @@ def run_live_simulation(count: int, interval: float) -> None:
     c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=f"sim-{random.randint(100, 999)}")
     if user:
         c.username_pw_set(user, passwd)
-    c.tls_set(ca_certs=ca_cert)
+    c.tls_set_context(ssl.create_default_context(cafile=ca_cert))
     c.connect(host, port, keepalive=10)
     c.loop_start()
 

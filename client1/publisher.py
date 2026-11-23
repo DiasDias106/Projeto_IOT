@@ -25,6 +25,7 @@ import argparse
 import json
 import logging
 import os
+import ssl
 import sys
 import threading
 import time
@@ -109,7 +110,9 @@ class Connection:
 def make_client(args: argparse.Namespace, conn: Connection) -> mqtt.Client:
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="client1", clean_session=False)
     client.username_pw_set(os.environ["MQTT_CLIENT1_USER"], os.environ["MQTT_CLIENT1_PASSWORD"])
-    client.tls_set(ca_certs=str(args.ca))
+    # Verifies the broker certificate and hostname with the group CA, TLS 1.2+. tls_set_context
+    # instead of tls_set: paho 2.1 tls_set uses ssl.PROTOCOL_TLSv1_2, removed in Python 3.15.
+    client.tls_set_context(ssl.create_default_context(cafile=str(args.ca)))
     client.reconnect_delay_set(min_delay=1, max_delay=30)
     client.max_inflight_messages_set(args.inflight)
     client.max_queued_messages_set(0)   # 0 = unlimited queue while disconnected

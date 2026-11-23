@@ -41,7 +41,7 @@ def client(user: str | None, password: str | None, tls: bool = True,
     if user:
         c.username_pw_set(user, password)
     if tls:
-        c.tls_set(ca_certs=ca)
+        c.tls_set_context(ssl.create_default_context(cafile=ca))   # ca=None: system CAs
 
     def on_connect(cl, u, f, rc, p):
         state["rc"] = rc
@@ -141,7 +141,7 @@ def run_listen(expect: int | None, idle_s: float) -> int:
     """Test subscriber (processor user, persistent session, QoS 1)."""
     c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="test-listener", clean_session=False)
     c.username_pw_set(*creds("PROCESSOR"))
-    c.tls_set(ca_certs=CA)
+    c.tls_set_context(ssl.create_default_context(cafile=CA))
     c.reconnect_delay_set(1, 5)
     seqs: dict[int, int] = {}
     state = {"total": 0, "last": time.monotonic(), "first": None}
