@@ -4,9 +4,10 @@ IoT platform that monitors and analyses the Citi Bike network in Jersey City and
 
 ## Team (Internet of Things 2026/27, FCUL, group 15.)
 
-- Tiago Freitas
 - Francisco Dias
 - Luís Lima
+- Tiago Freitas
+
 
 ## Architecture
 
