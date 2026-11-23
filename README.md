@@ -1,14 +1,15 @@
 # Bike-Sharing Infrastructure Management
 
-IoT platform that monitors and analyses the Citi Bike network in Jersey City and Hoboken. Internet of Things (IdC) 2026/27, FCUL, group 15.
+IoT platform that monitors and analyses the Citi Bike network in Jersey City and Hoboken.
 
-## Team
+## Team (Internet of Things 2026/27, FCUL, group 15.)
 
 | Name | Student number |
 |---|---|
-| Tiago Freitas | fc67976 |
 | Francisco Dias | fc68462 |
 | Luís Lima | fc62214 |
+| Tiago Freitas | fc67976 |
+
 
 ## Architecture
 
