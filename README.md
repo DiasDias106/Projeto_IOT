@@ -38,25 +38,28 @@ bash scripts/setup.sh
 
 `setup.sh` installs git, openssl, Python and Docker with Compose when they are missing. It then creates `certs/`, `.env` and `.venv`. It prints the Node-RED editor password once: save it. You can run it again safely, because it only adds what is missing. On Windows, install Docker Desktop and Python 3.12+ first.
 
-Options: `--start` also starts the services, and `--reset` deletes the database volume first (all data).
+Options: `--start` also starts the services (`scripts/run.sh`), and `--reset` deletes the database volume first (all data).
 
 ## Run
 
 ```bash
-docker compose up -d --build
-docker compose logs -f processor        # wait for "Processor ready"
+bash scripts/run.sh             # start, wait until ready, print the URLs
+bash scripts/run.sh restart     # restart, wait, print the URLs
+bash scripts/run.sh status      # state of the services and the URLs
+bash scripts/run.sh stop        # stop (data kept)
+bash scripts/run.sh logs processor
 ```
 
-On the first start the processor loads stage 1 (about 5 s) and requests the first training. A restart does not load it again.
+On the first start the processor loads stage 1 (about 5 s) and requests the first training. A restart does not load it again. The dashboard refreshes every 60 s.
 
-Replay stage 2 in another terminal:
+Replay stage 2 (Client 1) in another terminal:
 
 ```bash
 . .venv/bin/activate                    # Windows: .venv\Scripts\activate
 python client1/publisher.py --speed 60  # 60 = 1 h of data per minute; 0 = no waiting
 ```
 
-- Dashboard: https://localhost:1880/ui
+- Dashboard: https://localhost:1880/ui (tabs Historical Analytics, Live Operations, Map)
 - Editor: https://localhost:1880 (user `admin`)
 
 The browser warns about the certificate because the group CA signs it. Import `certs/ca.crt` into the browser, or accept the warning.
@@ -120,7 +123,7 @@ python scripts/infra_tests.py listen --expect 19856    # with: python client1/pu
 docker-compose.yml      the cloud services
 .env.example            variables (setup.sh creates .env from it)
 design-plan.md          solution design
-scripts/                setup, certificates, .env, EDA, infrastructure tests, mock data
+scripts/                setup, run, certificates, .env, EDA, infrastructure tests, mock data
 certs/                  TLS certificates (generated locally, never committed)
 mosquitto/config/       mosquitto.conf, acl, entrypoint.sh
 db/init/                SQL schema and users (run on the first start only)

@@ -2,7 +2,7 @@
 # One-time setup: installs what the project needs, then prepares certs, .env and the Python venv.
 #
 # Usage:  bash scripts/setup.sh            install + prepare
-#         bash scripts/setup.sh --start    ... and start the services (docker compose up -d --build)
+#         bash scripts/setup.sh --start    ... and start the services (scripts/run.sh)
 #         bash scripts/setup.sh --reset    ... and delete the DB volume first (docker compose down -v)
 #         bash scripts/setup.sh --no-install   skip system packages (only certs, .env, venv)
 #
@@ -199,26 +199,13 @@ if [ "$RESET" = 1 ]; then
   say "Deleting the database volume (docker compose down -v)"
   $DOCKER compose down -v
 fi
-port_busy() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
 if [ "$START" = 1 ]; then
-  say "Checking ports 1883 and 1880"
-  running="$($DOCKER compose ps --services --status running 2>/dev/null || true)"
-  for pair in 1883:mosquitto 1880:nodered; do
-    port="${pair%%:*}" svc="${pair##*:}"
-    if port_busy "$port" && ! grep -qx "$svc" <<<"$running"; then
-      die "Port $port is already in use by another program. Find it with: sudo ss -ltnp 'sport = :$port' (a local mosquitto: sudo systemctl disable --now mosquitto)."
-    fi
-  done
-  say "Starting the services"
-  $DOCKER compose up -d --build
-  $DOCKER compose ps
+  bash scripts/run.sh start
+  exit 0
 fi
 
 say "Done"
 cat <<EOF
-Next steps:
-  $DOCKER compose up -d --build          # start (skip if you used --start)
-  $DOCKER compose logs -f processor      # wait for "Processor ready"
-  . .venv/bin/activate && python client1/publisher.py --speed 60
-  Dashboard: https://localhost:1880/ui   (import certs/ca.crt in the browser, or accept the warning)
+Next step: start the services. It waits until they are ready and prints the addresses to open.
+  bash scripts/run.sh
 EOF
