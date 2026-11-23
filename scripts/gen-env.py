@@ -1,10 +1,10 @@
-"""Cria o .env a partir do .env.example, com passwords aleatórias.
+"""Creates .env from .env.example, with random passwords.
 
-Uso:  python scripts/gen-env.py            (não substitui um .env existente)
-      python scripts/gen-env.py --force    (substitui)
+Usage:  python scripts/gen-env.py            (does not replace an existing .env)
+        python scripts/gen-env.py --force    (replaces it)
 
-O hash bcrypt da password do editor Node-RED é gerado com o bcryptjs da imagem do Node-RED
-(precisa do Docker a correr). A password em texto é mostrada uma vez no fim: guardá-la.
+The Node-RED editor password is hashed with bcrypt. The plain password is shown once at the
+end: save it.
 """
 from __future__ import annotations
 
@@ -41,12 +41,12 @@ def bcrypt_hash(password: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--force", action="store_true", help="substituir o .env existente")
+    ap.add_argument("--force", action="store_true", help="replace the existing .env")
     args = ap.parse_args()
 
     target = ROOT / ".env"
     if target.exists() and not args.force:
-        print(".env já existe (usar --force para substituir)")
+        print(".env already exists (use --force to replace it)")
         return 1
 
     admin_password = secrets.token_urlsafe(12)
@@ -55,14 +55,14 @@ def main() -> int:
         key, sep, value = line.partition("=")
         if sep and not line.lstrip().startswith("#") and value == "":
             if key == "NODERED_ADMIN_PASSWORD_HASH":
-                value = f"'{bcrypt_hash(admin_password)}'"   # plicas: o hash tem '$'
+                value = f"'{bcrypt_hash(admin_password)}'"   # single quotes: the hash contains '$'
             elif key.endswith(RANDOM_KEYS_SUFFIX) or key in RANDOM_KEYS:
                 value = secrets.token_urlsafe(24)
         lines.append(f"{key}{sep}{value}" if sep else line)
 
     target.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
-    print(f".env criado em {target}")
-    print(f"Password do editor Node-RED (utilizador admin): {admin_password}")
+    print(f".env created at {target}")
+    print(f"Node-RED editor password (user admin): {admin_password}")
     return 0
 
 
