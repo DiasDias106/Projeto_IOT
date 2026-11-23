@@ -28,10 +28,15 @@ CREATE TABLE IF NOT EXISTS station_status (
     is_installed          TINYINT(1)  NOT NULL,
     is_renting            TINYINT(1)  NOT NULL,
     is_returning          TINYINT(1)  NOT NULL,
+    -- Data quality: suspicious rows are kept and flagged, never deleted (processor/PLAN.md, section 3)
+    quality_flag          ENUM('OK', 'NEGATIVE_COUNT', 'EBIKES_GT_BIKES', 'OVER_CAPACITY') NOT NULL DEFAULT 'OK',
+    source                ENUM('stage1', 'mqtt') NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY uq_status_seq (seq),
     KEY idx_status_station_ts (station_id, ts),
+    KEY idx_status_station_seq (station_id, seq),
     KEY idx_status_ts (ts),
+    KEY idx_status_flag (quality_flag),
     CONSTRAINT fk_status_station FOREIGN KEY (station_id) REFERENCES stations (station_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -56,7 +61,9 @@ CREATE TABLE IF NOT EXISTS trips (
     distance_km         DOUBLE       NULL,               -- Haversine entre estações (0 em viagens circulares)
     energy_kwh          DOUBLE       NULL,               -- 15 Wh/km só para electric_bike
     cost_usd            DECIMAL(8,2) NULL,
-    quality_flag        ENUM('OK', 'MISSING_END', 'OUT_OF_AREA', 'OUTLIER_SHORT', 'OUTLIER_LONG', 'NEVER_ENDED') NULL,  -- NULL enquanto a viagem está aberta
+    quality_flag        ENUM('OK', 'MISSING_END', 'MISSING_START', 'INVALID_DURATION', 'OUT_OF_AREA',
+                             'OUTLIER_SHORT', 'OUTLIER_LONG', 'NEVER_ENDED') NULL,  -- NULL enquanto a viagem está aberta
+    source              ENUM('stage1', 'mqtt') NULL,         -- source of the message that completed the row (trip_ended)
     seq_start           BIGINT       NULL,
     seq_end             BIGINT       NULL,
     PRIMARY KEY (trip_id),
@@ -64,7 +71,8 @@ CREATE TABLE IF NOT EXISTS trips (
     KEY idx_trips_ended (ended_at),
     KEY idx_trips_start_station (start_station_id, started_at),
     KEY idx_trips_end_station (end_station_id, ended_at),
-    KEY idx_trips_flag (quality_flag)
+    KEY idx_trips_flag (quality_flag),
+    KEY idx_trips_source_flag (source, quality_flag)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Um conjunto de linhas por treino. trained_at na chave permite ver a evolução dos perfis.
@@ -79,3 +87,54 @@ CREATE TABLE IF NOT EXISTS station_clusters (
     KEY idx_clusters_trained (trained_at),
     CONSTRAINT fk_clusters_station FOREIGN KEY (station_id) REFERENCES stations (station_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Dead-letter table: messages that cannot be stored in their own table (processor/PLAN.md, section 3).
+-- The raw payload is kept for audit and replay. station_id is a best effort (payload, then topic).
+CREATE TABLE IF NOT EXISTS rejected_messages (
+    id              BIGINT       NOT NULL AUTO_INCREMENT,
+    received_at     DATETIME(3)  NOT NULL,               -- processor wall clock (UTC)
+    source          ENUM('stage1', 'mqtt') NOT NULL,
+    topic           VARCHAR(255) NULL,
+    msg_type        VARCHAR(32)  NULL,
+    seq             BIGINT       NULL,
+    station_id      VARCHAR(16)  NULL,
+    event_ts        DATETIME     NULL,                   -- message ts, when it could be read
+    reason          ENUM('OVERSIZE', 'INVALID_JSON', 'NOT_AN_OBJECT', 'UNKNOWN_TYPE', 'MISSING_FIELD',
+                         'INVALID_VALUE', 'UNKNOWN_STATION', 'TOPIC_MISMATCH', 'DB_REJECTED') NOT NULL,
+    detail          VARCHAR(255) NULL,
+    payload         BLOB         NOT NULL,               -- raw bytes, at most 64 KiB
+    payload_sha256  CHAR(64)     NOT NULL,               -- same bytes delivered twice are stored once
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_rejected_payload (payload_sha256, reason),
+    KEY idx_rejected_station (station_id, reason),
+    KEY idx_rejected_received (received_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- One row per dataset file loaded to the end. No row = load again (inserts are idempotent).
+CREATE TABLE IF NOT EXISTS ingest_log (
+    dataset       VARCHAR(64) NOT NULL,
+    sha256        CHAR(64)    NOT NULL,
+    messages      INT         NOT NULL,
+    completed_at  DATETIME    NOT NULL,                  -- UTC
+    PRIMARY KEY (dataset)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Data quality per station and issue, for the dashboard (which sensors send bad data).
+-- Trips are attributed to their start station.
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW v_data_quality AS
+    SELECT station_id, 'station_status' AS origin, quality_flag AS issue,
+           COUNT(*) AS occurrences, MIN(ts) AS first_seen, MAX(ts) AS last_seen
+      FROM station_status
+     WHERE quality_flag <> 'OK'
+     GROUP BY station_id, quality_flag
+    UNION ALL
+    SELECT start_station_id, 'trips', quality_flag,
+           COUNT(*), MIN(started_at), MAX(started_at)
+      FROM trips
+     WHERE quality_flag IS NOT NULL AND quality_flag <> 'OK'
+     GROUP BY start_station_id, quality_flag
+    UNION ALL
+    SELECT station_id, 'rejected_messages', reason,
+           COUNT(*), MIN(COALESCE(event_ts, received_at)), MAX(COALESCE(event_ts, received_at))
+      FROM rejected_messages
+     GROUP BY station_id, reason;

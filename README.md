@@ -47,6 +47,9 @@ certs/                    # certificados (gerados localmente, não versionados)
 mosquitto/config/         # mosquitto.conf, acl, entrypoint.sh (passwords vêm do .env)
 db/init/                  # esquema SQL e utilizadores (correm na 1.ª inicialização)
 processor/app/            # Processor: main, bootstrap, listener (T1), worker (T2), writer (T3), scheduler (T4)
+processor/PLAN.md         # Processor plan: threads, stage 1 load, data quality (flags + rejected_messages)
+processor/tests/          # unit tests (pytest): calc, validation, flags
+scripts/eda_offline.py    # EDA of stage 1: thresholds, anomaly counts, gaps, rebalancing
 ml/app/                   # serviço ML: Flask, features, modelo
 nodered/data/             # settings.js (HTTPS, login) e flows.json (dashboard)
 client1/publisher.py      # Client 1, corre no host
@@ -62,11 +65,6 @@ O que falta está marcado com `TODO(<parte>)` no código. Enquanto uma parte nã
 | Parte | Ficheiros | O que implementar |
 |---|---|---|
 | **client1** | `client1/publisher.py` | `replay()`: espera `Δts / speed`, publica com QoS 1 |
-| **processor/bootstrap** | `processor/app/bootstrap.py` | `stations_loaded()`, `load_stations()`, `feed_stage1()` |
-| **processor/T2** | `processor/app/worker.py`, `calc.py` | parse, validação, `quality_flag`, Haversine, kWh, custo |
-| **processor/T3** | `processor/app/writer.py` | inserts em batch e idempotentes, contadores, `internal/status/<id>` |
-| **processor/T4** | `processor/app/scheduler.py` | `live_summary` a cada 2 s, retreino a cada 6 h de tempo de evento |
-| **ml** | `ml/app/features.py`, `model.py` | features por estação, K-Means (k = 3, 4, 5), `station_clusters` |
 | **dashboard** | Node-RED (editor) → `nodered/data/flows.json` | páginas de histórico, página live, mapa de clusters |
 
 Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros partilhados: `contracts.py`, `01_schema.sql`, `acl`, `docker-compose.yml`.
@@ -115,4 +113,10 @@ Dados abertos da Citi Bike entre 13 e 22 de março de 2024, com 83 estações (5
 | `stage1_offline.jsonl` | 13–19 mar | 53 724 (`seq` 1–53 724) |
 | `stage2_online.jsonl` | 20–22 mar | 19 856 (`seq` 53 725–73 580) |
 
-Tratamento de imperfeições (por prioridade): `MISSING_END` > `OUT_OF_AREA` > `OUTLIER_SHORT` > `OUTLIER_LONG` > `OK`. As viagens que nunca terminam são fechadas como `NEVER_ENDED`.
+Trip flags (first match wins): `MISSING_END` > `MISSING_START` > `INVALID_DURATION` > `OUT_OF_AREA` > `OUTLIER_SHORT` > `OUTLIER_LONG` > `OK`. Trips that never end are closed as `NEVER_ENDED`. See the Data quality section below.
+
+## Data quality (processor)
+
+Invalid data is never deleted. Rows that fit their table keep a `quality_flag` (`trips`, `station_status`). Messages that cannot fit (not JSON, missing field, bad value, unknown station, topic and payload disagree) go to `rejected_messages` with the raw payload. The view `v_data_quality` counts issues per station, for the dashboard part that shows which sensors send bad data. Rules and thresholds: [processor/PLAN.md](processor/PLAN.md). Counts for the report: `python scripts/eda_offline.py`.
+
+Unit tests: `pip install -r processor/requirements.txt pytest`, then `cd processor && python -m pytest tests`.

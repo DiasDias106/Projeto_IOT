@@ -29,13 +29,13 @@ def health():
 @app.post("/train")
 def train():
     if not _train_lock.acquire(blocking=False):
-        return jsonify(error="treino já em curso"), 409
+        return jsonify(error="training already running"), 409
     conn = db.connect()
     try:
         result = train_and_store(conn, build_features(conn))
         return jsonify(result)
-    except NotImplementedError:
-        return jsonify(error="TODO: treino ainda não implementado"), 501
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 422
     finally:
         conn.close()
         _train_lock.release()
@@ -46,8 +46,6 @@ def clusters():
     conn = db.connect()
     try:
         return jsonify(latest_clusters(conn))
-    except NotImplementedError:
-        return jsonify(error="TODO: ainda não implementado"), 501
     finally:
         conn.close()
 

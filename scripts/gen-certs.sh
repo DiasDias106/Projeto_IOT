@@ -10,7 +10,9 @@ DAYS=825
 
 if [ ! -f ca.key ]; then
   openssl genrsa -out ca.key 4096
-  openssl req -x509 -new -key ca.key -sha256 -days 3650 -subj "/CN=IdC fc15 CA" -out ca.crt
+  # keyUsage is required by strict X.509 checks (Python 3.13+ default)
+  openssl req -x509 -new -key ca.key -sha256 -days 3650 -subj "/CN=IdC fc15 CA" \
+    -addext "basicConstraints=critical,CA:TRUE" -addext "keyUsage=critical,keyCertSign,cRLSign" -out ca.crt
   echo "CA criada"
 fi
 
@@ -18,7 +20,7 @@ issue() {
   local name=$1 sans=$2
   openssl genrsa -out "$name.key" 2048
   openssl req -new -key "$name.key" -subj "/CN=$name" -out "$name.csr"
-  printf "subjectAltName=%s\nextendedKeyUsage=serverAuth\n" "$sans" > "$name.ext"
+  printf "subjectAltName=%s\nextendedKeyUsage=serverAuth\nkeyUsage=critical,digitalSignature,keyEncipherment\nauthorityKeyIdentifier=keyid,issuer\nsubjectKeyIdentifier=hash\n" "$sans" > "$name.ext"
   openssl x509 -req -in "$name.csr" -CA ca.crt -CAkey ca.key -CAcreateserial \
     -days "$DAYS" -sha256 -extfile "$name.ext" -out "$name.crt"
   rm -f "$name.csr" "$name.ext"

@@ -1,4 +1,4 @@
-"""Base comum das threads que consomem uma fila (T2 Worker e T3 Writer)."""
+"""Common base of the threads that consume a queue (T2 Workers)."""
 from __future__ import annotations
 
 import logging
@@ -7,36 +7,27 @@ import threading
 
 
 class QueueConsumer(threading.Thread):
-    """Tira itens da fila e chama handle(item). Marca task_done para o Bootstrap poder esperar."""
+    """Takes items from the queue and calls handle(item). Marks task_done so Bootstrap can wait."""
 
     def __init__(self, name: str, in_queue: queue.Queue, stop: threading.Event):
         super().__init__(name=name, daemon=True)
         self.in_queue = in_queue
         self.stop_event = stop
         self.log = logging.getLogger(name)
-        self._warned_todo = False
 
-    def handle(self, item) -> None:  # implementado nas subclasses
+    def handle(self, item) -> None:  # implemented by subclasses
         raise NotImplementedError
 
-    def on_idle(self) -> None:
-        """Chamado quando a fila esteve vazia 0,5 s (útil para fazer flush de batches)."""
-
     def run(self) -> None:
-        self.log.info("a arrancar")
-        while not self.stop_event.is_set():
+        self.log.info("starting")
+        while not (self.stop_event.is_set() and self.in_queue.empty()):
             try:
                 item = self.in_queue.get(timeout=0.5)
             except queue.Empty:
-                self.on_idle()
                 continue
             try:
                 self.handle(item)
-            except NotImplementedError:
-                if not self._warned_todo:
-                    self.log.warning("TODO: handle() ainda não implementado; itens ignorados")
-                    self._warned_todo = True
             except Exception:
-                self.log.exception("erro ao tratar item: %r", item)
+                self.log.exception("error handling an item")
             finally:
                 self.in_queue.task_done()
