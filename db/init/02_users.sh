@@ -1,6 +1,6 @@
 #!/bin/bash
-# Cria um utilizador por serviço, todos obrigados a usar TLS.
-# Só o Processor escreve os dados; o ML lê tudo e escreve apenas station_clusters; o Node-RED só lê.
+# One user per service, all required to use TLS.
+# Only the Processor writes the data; ML reads everything and writes only station_clusters; Node-RED only reads.
 set -e
 
 mysql -uroot -p"$MYSQL_ROOT_PASSWORD" <<SQL

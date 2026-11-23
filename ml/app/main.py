@@ -1,8 +1,8 @@
-"""Serviço ML em Flask sobre HTTPS (design-plan.md, secção 5).
+"""ML service in Flask over HTTPS (design-plan.md, section 5).
 
   GET  /health     -> {"status": "ok"}
-  POST /train      -> treina com os dados atuais e grava em station_clusters
-  GET  /clusters   -> atribuições do treino mais recente
+  POST /train      -> trains on the current data and writes station_clusters
+  GET  /clusters   -> assignments of the newest training
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from .model import latest_clusters, train_and_store
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
 app = Flask(__name__)
-_train_lock = threading.Lock()   # um treino de cada vez
+_train_lock = threading.Lock()   # one training at a time
 
 
 @app.get("/health")

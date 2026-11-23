@@ -1,5 +1,5 @@
-// Node-RED: HTTPS na porta 1880 e login no editor (design-plan.md, secção 1).
-// Os valores sensíveis vêm do .env através do docker-compose.yml.
+// Node-RED: HTTPS on port 1880 and editor login (design-plan.md, section 1).
+// Sensitive values come from .env through docker-compose.yml.
 const fs = require("fs");
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     flowFile: "flows.json",
     flowFilePretty: true,
 
-    // Cifra o flows_cred.json (que não é versionado)
+    // Encrypts flows_cred.json (not committed)
     credentialSecret: process.env.NODERED_CREDENTIAL_SECRET,
 
     https: {
@@ -25,10 +25,10 @@ module.exports = {
         }],
     },
 
-    // Dashboard em https://localhost:1880/ui
+    // Dashboard at https://localhost:1880/ui
     ui: { path: "ui" },
 
-    // Disponível nos nós function como env.get("...") ou nos campos com ${...}
+    // Available in function nodes as env.get("...") or in fields as ${...}
     functionGlobalContext: {},
 
     logging: { console: { level: "info", metrics: false, audit: false } },

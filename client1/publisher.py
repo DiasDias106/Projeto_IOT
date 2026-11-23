@@ -1,23 +1,23 @@
-"""Client 1: emula as estações e reproduz o stage2_online.jsonl no broker (design-plan.md, secção 1).
+"""Client 1: emulates the stations and replays stage2_online.jsonl to the broker (design-plan.md, section 1).
 
-Corre no host:
-    pip install -r client1/requirements.txt
-    python client1/publisher.py --speed 60            # 1 h de dados por minuto
-    python client1/publisher.py --speed 0             # sem esperas (teste de carga)
-    python client1/publisher.py --from-seq 60000      # retomar a partir de um seq
-    python client1/publisher.py --dry-run --speed 0   # só mostra o que publicaria
+Runs on the host:
+    . .venv/bin/activate
+    python client1/publisher.py --speed 60            # 1 h of data per minute
+    python client1/publisher.py --speed 0             # no waiting (load test)
+    python client1/publisher.py --from-seq 60000      # resume from a seq
+    python client1/publisher.py --dry-run --speed 0   # only show what would be published
 
-Desenho (para o relatório):
-  - Payload: cada linha é publicada sem alterações (o ts original é mantido), no tópico do seu tipo,
-    com QoS 1.
-  - Tempo: a espera é calculada a partir do início, alvo = t0 + (ts - ts0) / speed, e não somando
-    Δts / speed a cada mensagem. Assim os atrasos (por exemplo, numa reconexão) não se acumulam: o
-    publisher recupera e volta a ficar alinhado. Mensagens com o mesmo ts saem seguidas.
-  - Reconexão: o paho reconecta sozinho (1 s a 30 s de espera). clean_session=False e QoS 1: o que é
-    publicado durante uma desconexão fica na fila do cliente e é enviado ao reconectar. O broker
-    guarda a sessão. Duplicados possíveis são ignorados pelo Processor (seq único).
-  - Fim: espera pela confirmação (PUBACK) de todas as mensagens antes de desligar.
-  - Paragem (Ctrl+C): mostra o último seq publicado, para retomar com --from-seq.
+Design (for the report):
+  - Payload: each line is published unchanged (the original ts is kept), on its type's topic,
+    with QoS 1.
+  - Timing: the wait is computed from the start, target = t0 + (ts - ts0) / speed, instead of adding
+    Δts / speed per message. Delays (for example, during a reconnect) do not accumulate: the
+    publisher catches up and is aligned again. Messages with the same ts go out back to back.
+  - Reconnection: paho reconnects by itself (1 s to 30 s backoff). clean_session=False and QoS 1:
+    what is published while disconnected stays in the client queue and is sent on reconnect. The
+    broker keeps the session. Possible duplicates are ignored by the Processor (unique seq).
+  - End: waits for the broker's PUBACK of every message before disconnecting.
+  - Stop (Ctrl+C): shows the last published seq, to resume with --from-seq.
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ PROGRESS_EVERY_S = 10.0
 
 
 def topic_for(msg: dict) -> str:
-    """Tópico de cada tipo de mensagem (design-plan.md, secção 2)."""
+    """Topic of each message type (design-plan.md, section 2)."""
     kind = msg["type"]
     if kind == "station_status":
         return f"{TOPIC_PREFIX}/status/{msg['station_id']}"
@@ -55,7 +55,7 @@ def topic_for(msg: dict) -> str:
         return f"{TOPIC_PREFIX}/trips/started"
     if kind == "trip_ended":
         return f"{TOPIC_PREFIX}/trips/ended"
-    raise ValueError(f"tipo desconhecido: {kind}")
+    raise ValueError(f"unknown type: {kind}")
 
 
 @dataclass
@@ -64,7 +64,7 @@ class Stats:
     acked: int = 0
     skipped: int = 0
     disconnects: int = 0
-    max_lag_s: float = 0.0          # atraso máximo face ao alvo (relógio real)
+    max_lag_s: float = 0.0          # maximum lag behind the target (wall clock)
     last_seq: int | None = None
     last_ts: str | None = None
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
@@ -75,7 +75,7 @@ class Stats:
 
 
 class Connection:
-    """Estado da ligação partilhado entre a thread do paho e o ciclo de replay."""
+    """Connection state shared by the paho thread and the replay loop."""
 
     def __init__(self, stats: Stats):
         self.stats = stats
@@ -84,23 +84,23 @@ class Connection:
 
     def on_connect(self, client, userdata, flags, reason_code, properties):
         if reason_code.is_failure:
-            # Credenciais erradas ou não autorizado: não adianta continuar a tentar
-            self.fatal = f"ligação recusada pelo broker: {reason_code}"
+            # Wrong credentials or not authorised: retrying will not help
+            self.fatal = f"connection refused by the broker: {reason_code}"
             log.error(self.fatal)
             self.connected.set()
             return
-        log.info("ligado ao broker (sessão retomada: %s)", flags.session_present)
+        log.info("connected to the broker (session resumed: %s)", flags.session_present)
         self.connected.set()
 
     def on_disconnect(self, client, userdata, flags, reason_code, properties):
         self.connected.clear()
         if reason_code.is_failure:
             self.stats.disconnects += 1
-            log.warning("desligado do broker (%s); a reconectar, as mensagens ficam em fila",
+            log.warning("disconnected from the broker (%s); reconnecting, messages stay queued",
                         reason_code)
 
     def on_connect_fail(self, client, userdata):
-        log.warning("broker inacessível; nova tentativa em breve")
+        log.warning("broker unreachable; retrying soon")
 
     def on_publish(self, client, userdata, mid, reason_code, properties):
         self.stats.ack()
@@ -112,7 +112,7 @@ def make_client(args: argparse.Namespace, conn: Connection) -> mqtt.Client:
     client.tls_set(ca_certs=str(args.ca))
     client.reconnect_delay_set(min_delay=1, max_delay=30)
     client.max_inflight_messages_set(args.inflight)
-    client.max_queued_messages_set(0)   # 0 = fila sem limite durante desconexões
+    client.max_queued_messages_set(0)   # 0 = unlimited queue while disconnected
     client.on_connect = conn.on_connect
     client.on_disconnect = conn.on_disconnect
     client.on_connect_fail = conn.on_connect_fail
@@ -121,7 +121,7 @@ def make_client(args: argparse.Namespace, conn: Connection) -> mqtt.Client:
 
 
 def read_messages(path: Path, from_seq: int | None, stats: Stats) -> Iterator[tuple[str, dict]]:
-    """Devolve (linha original, mensagem) por ordem. Linhas inválidas são ignoradas (log)."""
+    """Yields (original line, message) in order. Invalid lines are skipped (logged)."""
     with path.open("r", encoding="utf-8") as fh:
         for lineno, line in enumerate(fh, start=1):
             line = line.strip()
@@ -133,7 +133,7 @@ def read_messages(path: Path, from_seq: int | None, stats: Stats) -> Iterator[tu
                 topic_for(msg)
             except (ValueError, KeyError) as exc:
                 stats.skipped += 1
-                log.warning("linha %d ignorada (%s)", lineno, exc)
+                log.warning("line %d skipped (%s)", lineno, exc)
                 continue
             if from_seq is not None and msg.get("seq", 0) < from_seq:
                 continue
@@ -143,9 +143,9 @@ def read_messages(path: Path, from_seq: int | None, stats: Stats) -> Iterator[tu
 def replay(client: mqtt.Client | None, path: Path, speed: float, stats: Stats,
            from_seq: int | None = None, limit: int | None = None,
            stop: threading.Event | None = None) -> Stats:
-    """Publica cada mensagem no seu tópico, preservando os intervalos originais divididos por speed.
+    """Publishes each message on its topic, keeping the original intervals divided by speed.
 
-    speed <= 0 publica sem esperas. client=None faz um dry-run (não publica, só mostra o tópico).
+    speed <= 0 publishes without waiting. client=None is a dry run (shows the topic, publishes nothing).
     """
     stop = stop or threading.Event()
     t0_wall: float | None = None
@@ -158,8 +158,8 @@ def replay(client: mqtt.Client | None, path: Path, speed: float, stats: Stats,
         ts = msg.pop("_ts")
         if t0_wall is None:
             t0_wall, ts0 = time.monotonic(), ts
-            log.info("início do replay: ts=%s seq=%s speed=%s", msg["ts"], msg.get("seq"),
-                     speed if speed > 0 else "sem esperas")
+            log.info("replay start: ts=%s seq=%s speed=%s", msg["ts"], msg.get("seq"),
+                     speed if speed > 0 else "no waiting")
 
         if speed > 0:
             target = t0_wall + (ts - ts0).total_seconds() / speed
@@ -174,7 +174,7 @@ def replay(client: mqtt.Client | None, path: Path, speed: float, stats: Stats,
         if client is None:
             log.info("[dry-run] %s %s seq=%s", msg["ts"], topic, msg.get("seq"))
         else:
-            # Payload sem alterações. Desligado: o paho guarda em fila (QoS 1) e envia ao reconectar.
+            # Payload unchanged. While disconnected, paho queues it (QoS 1) and sends it on reconnect.
             client.publish(topic, payload=line, qos=1)
         stats.published += 1
         stats.last_seq, stats.last_ts = msg.get("seq"), msg["ts"]
@@ -182,7 +182,7 @@ def replay(client: mqtt.Client | None, path: Path, speed: float, stats: Stats,
         now = time.monotonic()
         if now - last_progress >= PROGRESS_EVERY_S:
             last_progress = now
-            log.info("progresso: %d publicadas, %d confirmadas, ts=%s, atraso máx=%.2fs",
+            log.info("progress: %d published, %d acknowledged, ts=%s, max lag=%.2fs",
                      stats.published, stats.acked, stats.last_ts, stats.max_lag_s)
     return stats
 
@@ -195,26 +195,26 @@ def wait_for_acks(stats: Stats, timeout_s: float) -> bool:
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Reproduz o dataset online no broker MQTT (TLS).")
+    p = argparse.ArgumentParser(description="Replays the online dataset to the MQTT broker (TLS).")
     p.add_argument("--file", type=Path, default=ROOT / "dataset-IdC-2627" / "stage2_online.jsonl")
     p.add_argument("--speed", type=float, default=float(os.environ.get("REPLAY_SPEED", "60")),
-                   help="fator de velocidade (60 = uma hora de dados num minuto; 0 = sem esperas)")
+                   help="speed factor (60 = one hour of data per minute; 0 = no waiting)")
     p.add_argument("--host", default=os.environ.get("CLIENT1_MQTT_HOST", "localhost"))
     p.add_argument("--port", type=int, default=int(os.environ.get("MQTT_PORT", "1883")))
     p.add_argument("--ca", type=Path, default=ROOT / "certs" / "ca.crt")
-    p.add_argument("--from-seq", type=int, default=None, help="começar no primeiro seq >= este")
-    p.add_argument("--limit", type=int, default=None, help="publicar no máximo N mensagens")
-    p.add_argument("--inflight", type=int, default=100, help="mensagens QoS 1 por confirmar em voo")
+    p.add_argument("--from-seq", type=int, default=None, help="start at the first seq >= this")
+    p.add_argument("--limit", type=int, default=None, help="publish at most N messages")
+    p.add_argument("--inflight", type=int, default=100, help="unacknowledged QoS 1 messages in flight")
     p.add_argument("--ack-timeout", type=float, default=60.0,
-                   help="segundos a esperar pelas confirmações no fim")
-    p.add_argument("--dry-run", action="store_true", help="não liga ao broker; só mostra")
+                   help="seconds to wait for acknowledgements at the end")
+    p.add_argument("--dry-run", action="store_true", help="do not connect to the broker; only show")
     return p.parse_args(argv)
 
 
 def summary(stats: Stats, elapsed_s: float) -> None:
     rate = stats.published / elapsed_s if elapsed_s > 0 else 0.0
-    log.info("fim: %d publicadas, %d confirmadas, %d linhas ignoradas, %d desconexões, "
-             "%.1fs (%.0f msg/s), atraso máx=%.2fs, último seq=%s",
+    log.info("done: %d published, %d acknowledged, %d lines skipped, %d disconnects, "
+             "%.1fs (%.0f msg/s), max lag=%.2fs, last seq=%s",
              stats.published, stats.acked, stats.skipped, stats.disconnects,
              elapsed_s, rate, stats.max_lag_s, stats.last_seq)
 
@@ -233,10 +233,10 @@ def main(argv: list[str] | None = None) -> int:
     conn = Connection(stats)
     client = make_client(args, conn)
     client.connect_async(args.host, args.port, keepalive=60)
-    client.loop_start()   # a thread do paho trata da ligação e das reconexões
+    client.loop_start()   # paho's thread handles the connection and reconnects
     start = time.monotonic()
     try:
-        log.info("a ligar a %s:%d (TLS)...", args.host, args.port)
+        log.info("connecting to %s:%d (TLS)...", args.host, args.port)
         conn.connected.wait()
         if conn.fatal:
             return 2
@@ -244,11 +244,11 @@ def main(argv: list[str] | None = None) -> int:
         replay(client, args.file, args.speed, stats, args.from_seq, args.limit, stop)
     except KeyboardInterrupt:
         stop.set()
-        log.warning("interrompido; para retomar: --from-seq %s",
-                    (stats.last_seq + 1) if stats.last_seq is not None else "<início>")
+        log.warning("interrupted; to resume: --from-seq %s",
+                    (stats.last_seq + 1) if stats.last_seq is not None else "<start>")
     finally:
         if not conn.fatal and not wait_for_acks(stats, args.ack_timeout):
-            log.warning("%d mensagens sem confirmação do broker",
+            log.warning("%d messages not acknowledged by the broker",
                         stats.published - stats.acked)
         client.disconnect()
         client.loop_stop()

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Gera o ficheiro de passwords a partir das variáveis de ambiente (.env) e arranca o broker.
+# Builds the password file from the environment variables (.env) and starts the broker.
 set -e
 
 PASSWD=/mosquitto/passwd

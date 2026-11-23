@@ -1,20 +1,20 @@
-# ACL por cliente (grupo 15). Ver design-plan.md, secção 2.
+# ACL per client (group 15). See design-plan.md, section 2.
 
-# Client 1: estações (publisher do stage 2)
+# Client 1: stations (stage 2 publisher)
 user client1
 topic write idc/fc15/status/+
 topic write idc/fc15/trips/started
 topic write idc/fc15/trips/ended
 
-# Processor: recebe os dados das estações e publica os tópicos internos
+# Processor: receives the station data and publishes the internal topics
 user processor
 topic read idc/fc15/status/+
 topic read idc/fc15/trips/started
 topic read idc/fc15/trips/ended
 topic write idc/fc15/internal/#
-# Usado pelo healthcheck do container do broker
+# Used by the broker container healthcheck
 topic read $SYS/broker/uptime
 
-# Node-RED: só lê os tópicos internos
+# Node-RED: reads the internal topics only
 user nodered
 topic read idc/fc15/internal/#
