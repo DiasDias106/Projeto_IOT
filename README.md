@@ -4,9 +4,11 @@ IoT platform that monitors and analyses the Citi Bike network in Jersey City and
 
 ## Team
 
-- Tiago Freitas
-- Francisco Dias
-- Luís Lima
+| Name | Student number |
+|---|---|
+| Tiago Freitas | fc67976 |
+| Francisco Dias | fc68462 |
+| Luís Lima | fc62214 |
 
 ## Architecture
 
