@@ -21,11 +21,21 @@ RANDOM_KEYS = {"NODERED_CREDENTIAL_SECRET"}
 
 
 def bcrypt_hash(password: str) -> str:
+    """bcrypt hash for Node-RED. Uses the Python bcrypt package (installed by scripts/setup.sh);
+    without it, falls back to bcryptjs inside the Node-RED image (needs Docker)."""
+    try:
+        import bcrypt
+        return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=8)).decode()
+    except ImportError:
+        pass
     out = subprocess.run(
         ["docker", "run", "--rm", "--entrypoint", "node", NODERED_IMAGE,
          "-e", "console.log(require('bcryptjs').hashSync(process.argv[1], 8))", password],
-        check=True, capture_output=True, text=True,
+        capture_output=True, text=True,
     )
+    if out.returncode != 0:
+        sys.exit("Could not hash the Node-RED password with Docker:\n" + out.stderr.strip()
+                 + "\nRun scripts/setup.sh first (it installs bcrypt), or fix Docker.")
     return out.stdout.strip()
 
 

@@ -71,6 +71,10 @@ Para não haver conflitos, combinem com o grupo antes de alterar os ficheiros pa
 
 ## Como correr
 
+0. **Setup (once, Linux/macOS/Git Bash):** installs git, openssl, Python and Docker with Compose when missing, then creates `certs/`, `.env` and `.venv` (steps 1, 2 and the `pip install` of step 4). Add `--start` to also run step 3, or `--reset` to delete the DB volume first:
+   ```bash
+   bash scripts/setup.sh
+   ```
 1. Criar o `.env` com passwords aleatórias (com o Docker a correr). O script mostra a password do editor Node-RED, que deve ser guardada:
    ```bash
    python scripts/gen-env.py
