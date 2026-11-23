@@ -1,13 +1,13 @@
-"""Utilitário para gerar e injetar dados de teste válidos no sistema.
+"""Dashboard development helper: injects test data without the processor.
 
-Uso:
-    # 1. Carregar 500 viagens reais do stage1_offline.jsonl para o MySQL:
+Usage:
+    # 1. Load 500 real trips from stage1_offline.jsonl into MySQL:
     .venv/bin/python scripts/mock_data.py stage1 --limit 500
 
-    # 2. Transmitir telemetria live simulada por MQTT a cada 2 segundos:
+    # 2. Publish a simulated live_summary over MQTT every 2 seconds:
     .venv/bin/python scripts/mock_data.py live --count 20 --interval 2
 
-    # 3. Limpar dados de teste da tabela trips:
+    # 3. Delete the test data from the trips table:
     .venv/bin/python scripts/mock_data.py clean
 """
 from __future__ import annotations
@@ -19,6 +19,7 @@ import math
 import os
 import random
 import subprocess
+import ssl
 import sys
 import time
 from pathlib import Path
@@ -73,10 +74,10 @@ def run_sql(sql: str) -> str:
 def load_stage1_sample(limit: int) -> int:
     jsonl_path = ROOT / "dataset-IdC-2627" / "stage1_offline.jsonl"
     if not jsonl_path.exists():
-        print(f"Ficheiro não encontrado: {jsonl_path}")
+        print(f"File not found: {jsonl_path}")
         return 0
 
-    print(f"A processar {limit} viagens de {jsonl_path.name}...")
+    print(f"Processing {limit} trips from {jsonl_path.name}...")
     inserted = 0
     values = []
 
@@ -156,7 +157,7 @@ def load_stage1_sample(limit: int) -> int:
         run_sql(sql)
 
     count_res = run_sql("SELECT count(*) AS total_trips FROM trips;")
-    print(f"Sucesso! {inserted} viagens inseridas na tabela trips.")
+    print(f"Done: {inserted} trips inserted into the trips table.")
     print(count_res)
     return inserted
 
@@ -171,11 +172,11 @@ def run_live_simulation(count: int, interval: float) -> None:
     c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=f"sim-{random.randint(100, 999)}")
     if user:
         c.username_pw_set(user, passwd)
-    c.tls_set(ca_certs=ca_cert)
+    c.tls_set_context(ssl.create_default_context(cafile=ca_cert))
     c.connect(host, port, keepalive=10)
     c.loop_start()
 
-    print(f"A emitir {count} atualizações para 'idc/fc15/internal/live_summary' (intervalo: {interval}s)...")
+    print(f"Publishing {count} updates to 'idc/fc15/internal/live_summary' (interval: {interval}s)...")
     base_trips = 80
     base_energy = 25.0
 
@@ -198,31 +199,31 @@ def run_live_simulation(count: int, interval: float) -> None:
                 "updated_at": datetime.datetime.now().isoformat()
             }
             c.publish("idc/fc15/internal/live_summary", json.dumps(payload), qos=1)
-            print(f"[{i+1}/{count}] Enviado: {payload['active_trips']} ativas, {payload['total_bikes_avail']} disponíveis, {payload['stage2_energy_kwh']} kWh")
+            print(f"[{i+1}/{count}] Sent: {payload['active_trips']} active, {payload['total_bikes_avail']} available, {payload['stage2_energy_kwh']} kWh")
             time.sleep(interval)
     finally:
         c.disconnect()
         c.loop_stop()
-        print("Simulação live concluída.")
+        print("Live simulation done.")
 
 
 def clean_trips() -> None:
     run_sql("TRUNCATE TABLE trips;")
-    print("Tabela trips limpa com sucesso (0 registos).")
+    print("trips table emptied (0 rows).")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Mock data injector para Citi Bike IdC")
+    parser = argparse.ArgumentParser(description="Mock data injector for the Citi Bike IdC project")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
-    s1_parser = sub.add_parser("stage1", help="Injeta amostra de viagens reais do stage 1 no MySQL")
-    s1_parser.add_argument("--limit", type=int, default=500, help="Número de viagens a injetar (default: 500)")
+    s1_parser = sub.add_parser("stage1", help="Insert a sample of real stage 1 trips into MySQL")
+    s1_parser.add_argument("--limit", type=int, default=500, help="Number of trips to insert (default: 500)")
 
-    live_parser = sub.add_parser("live", help="Simula fluxo MQTT live_summary em tempo real")
-    live_parser.add_argument("--count", type=int, default=15, help="Número de mensagens (default: 15)")
-    live_parser.add_argument("--interval", type=float, default=2.0, help="Intervalo em segundos (default: 2.0)")
+    live_parser = sub.add_parser("live", help="Simulate the live_summary MQTT stream")
+    live_parser.add_argument("--count", type=int, default=15, help="Number of messages (default: 15)")
+    live_parser.add_argument("--interval", type=float, default=2.0, help="Interval in seconds (default: 2.0)")
 
-    sub.add_parser("clean", help="Limpa todas as viagens da tabela trips")
+    sub.add_parser("clean", help="Delete every trip from the trips table")
 
     args = parser.parse_args()
 

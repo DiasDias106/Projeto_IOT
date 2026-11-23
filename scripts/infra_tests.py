@@ -1,10 +1,10 @@
-"""Testes da infraestrutura (broker MQTT com TLS e ACL), a correr no host com a stack levantada.
+"""Infrastructure tests (MQTT broker with TLS and ACL), run on the host with the stack up.
 
-    python scripts/infra_tests.py security          # TLS, autenticação e ACL
+    python scripts/infra_tests.py security          # TLS, authentication and ACL
     python scripts/infra_tests.py listen --expect 19856
-        # subscritor de teste: conta as mensagens do client1 (seq únicos e duplicados)
+        # test subscriber: counts client1's messages (unique seq and duplicates)
 
-Usa as credenciais do .env e o certs/ca.crt.
+Uses the credentials in .env and certs/ca.crt.
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def client(user: str | None, password: str | None, tls: bool = True,
     if user:
         c.username_pw_set(user, password)
     if tls:
-        c.tls_set(ca_certs=ca)
+        c.tls_set_context(ssl.create_default_context(cafile=ca))   # ca=None: system CAs
 
     def on_connect(cl, u, f, rc, p):
         state["rc"] = rc
@@ -53,37 +53,37 @@ def client(user: str | None, password: str | None, tls: bool = True,
 
 
 def try_connect(user, password, tls=True, ca=CA, timeout=5.0) -> str:
-    """Devolve 'ok' ou a razão da falha."""
+    """Returns 'ok' or the reason for the failure."""
     c, st = client(user, password, tls, ca)
     try:
         c.connect(HOST, PORT, keepalive=10)
     except (ssl.SSLError, OSError) as exc:
-        return f"falhou no TLS/rede: {type(exc).__name__}: {exc}"
+        return f"failed at TLS/network: {type(exc).__name__}: {exc}"
     c.loop_start()
     got = st["connected"].wait(timeout)
     c.disconnect()
     c.loop_stop()
     if not got:
-        return "sem resposta do broker"
-    return "ok" if not st["rc"].is_failure else f"recusado: {st['rc']}"
+        return "no answer from the broker"
+    return "ok" if not st["rc"].is_failure else f"refused: {st['rc']}"
 
 
 def plain_tcp_probe() -> str:
-    """Envia um CONNECT MQTT em claro para a porta TLS e vê o que acontece."""
+    """Sends a plaintext MQTT CONNECT to the TLS port and checks what happens."""
     connect_pkt = bytes([0x10, 0x10, 0x00, 0x04]) + b"MQTT" + bytes([0x04, 0x02, 0x00, 0x3C, 0x00, 0x04]) + b"test"
     with socket.create_connection((HOST, PORT), timeout=5) as s:
         s.sendall(connect_pkt)
         try:
             data = s.recv(16)
         except (socket.timeout, ConnectionResetError) as exc:
-            return f"sem CONNACK ({type(exc).__name__})"
+            return f"no CONNACK ({type(exc).__name__})"
     if data[:1] == b"\x20":
-        return "CONNACK recebido em claro (MAU)"
-    return f"sem CONNACK (ligação fechada, {len(data)} bytes)"
+        return "CONNACK received in plaintext (BAD)"
+    return f"no CONNACK (connection closed, {len(data)} bytes)"
 
 
 def acl_check(pub_who: str, topic: str, sub_who: str, sub_topic: str) -> bool:
-    """True se a mensagem publicada por pub_who em topic chega a sub_who."""
+    """True if the message published by pub_who on topic reaches sub_who."""
     sub, sst = client(*creds(sub_who))
     sub.connect(HOST, PORT)
     sub.loop_start()
@@ -112,42 +112,42 @@ def run_security() -> int:
 
     u, p = creds("CLIENT1")
     r = try_connect(u, p)
-    check("client1 com TLS e password certa liga", r == "ok", r)
-    r = try_connect(u, "password-errada")
-    check("password errada é recusada", r.startswith("recusado"), r)
+    check("client1 with TLS and the right password connects", r == "ok", r)
+    r = try_connect(u, "wrong-password")
+    check("wrong password is refused", r.startswith("refused"), r)
     r = try_connect(None, None)
-    check("ligação anónima é recusada", r.startswith("recusado"), r)
+    check("anonymous connection is refused", r.startswith("refused"), r)
     r = plain_tcp_probe()
-    check("MQTT sem TLS na porta 1883 não é aceite", "MAU" not in r, r)
+    check("MQTT without TLS on port 1883 is not accepted", "BAD" not in r, r)
     r = try_connect(u, p, ca=ssl.get_default_verify_paths().cafile or None)
-    check("cliente sem a CA do grupo não confia no broker", r != "ok", r)
+    check("client without the group CA does not trust the broker", r != "ok", r)
 
-    check("ACL: client1 -> status/+ chega ao processor",
+    check("ACL: client1 -> status/+ reaches the processor",
           acl_check("CLIENT1", f"{PREFIX}/status/TEST", "PROCESSOR", f"{PREFIX}/status/+"))
-    check("ACL: client1 NÃO consegue publicar em internal/#",
+    check("ACL: client1 CANNOT publish to internal/#",
           not acl_check("CLIENT1", f"{PREFIX}/internal/live_summary", "NODERED", f"{PREFIX}/internal/#"))
-    check("ACL: processor -> internal/# chega ao nodered",
+    check("ACL: processor -> internal/# reaches nodered",
           acl_check("PROCESSOR", f"{PREFIX}/internal/live_summary", "NODERED", f"{PREFIX}/internal/#"))
-    check("ACL: nodered NÃO consegue ler os dados das estações",
+    check("ACL: nodered CANNOT read the station data",
           not acl_check("CLIENT1", f"{PREFIX}/trips/started", "NODERED", f"{PREFIX}/trips/#"))
-    check("ACL: client1 NÃO consegue publicar fora de idc/fc15",
+    check("ACL: client1 CANNOT publish outside idc/fc15",
           not acl_check("CLIENT1", "idc/fc99/status/X", "PROCESSOR", "#"))
 
-    print(f"\n{sum(results)}/{len(results)} testes passaram")
+    print(f"\n{sum(results)}/{len(results)} tests passed")
     return 0 if all(results) else 1
 
 
 def run_listen(expect: int | None, idle_s: float) -> int:
-    """Subscritor de teste (utilizador processor, sessão persistente, QoS 1)."""
+    """Test subscriber (processor user, persistent session, QoS 1)."""
     c = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="test-listener", clean_session=False)
     c.username_pw_set(*creds("PROCESSOR"))
-    c.tls_set(ca_certs=CA)
+    c.tls_set_context(ssl.create_default_context(cafile=CA))
     c.reconnect_delay_set(1, 5)
     seqs: dict[int, int] = {}
     state = {"total": 0, "last": time.monotonic(), "first": None}
 
     def on_connect(cl, u, f, rc, p):
-        print(f"ligado ({rc}, sessão retomada={f.session_present})", flush=True)
+        print(f"connected ({rc}, session resumed={f.session_present})", flush=True)
         cl.subscribe([(f"{PREFIX}/status/+", 1), (f"{PREFIX}/trips/+", 1)])
 
     def on_message(cl, u, m):
@@ -159,10 +159,10 @@ def run_listen(expect: int | None, idle_s: float) -> int:
 
     c.on_connect = on_connect
     c.on_message = on_message
-    c.on_disconnect = lambda cl, u, f, rc, p: print(f"desligado ({rc})", flush=True)
+    c.on_disconnect = lambda cl, u, f, rc, p: print(f"disconnected ({rc})", flush=True)
     c.connect(HOST, PORT)
     c.loop_start()
-    print(f"à escuta; termina após {idle_s:.0f}s sem mensagens", flush=True)
+    print(f"listening; stops after {idle_s:.0f}s without messages", flush=True)
     try:
         while True:
             time.sleep(1)
@@ -176,15 +176,15 @@ def run_listen(expect: int | None, idle_s: float) -> int:
     c.loop_stop()
     dup = sum(n - 1 for n in seqs.values())
     span = (state["last"] - state["first"]) if state["first"] else 0
-    print(f"recebidas={state['total']} seq únicos={len(seqs)} duplicados={dup} "
-          f"duração={span:.1f}s ({state['total'] / span if span else 0:.0f} msg/s)")
+    print(f"received={state['total']} unique seq={len(seqs)} duplicates={dup} "
+          f"duration={span:.1f}s ({state['total'] / span if span else 0:.0f} msg/s)")
     if seqs:
         lo, hi = min(seqs), max(seqs)
         missing = (hi - lo + 1) - len(seqs)
-        print(f"seq {lo}..{hi}, em falta no intervalo: {missing}")
+        print(f"seq {lo}..{hi}, missing in the range: {missing}")
     if expect is not None:
         ok = len(seqs) == expect
-        print(f"[{'PASS' if ok else 'FAIL'}] esperados {expect} seq únicos")
+        print(f"[{'PASS' if ok else 'FAIL'}] expected {expect} unique seq")
         return 0 if ok else 1
     return 0
 

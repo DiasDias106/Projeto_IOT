@@ -1,5 +1,5 @@
-# Plataforma de bike-sharing (IdC 2026/27, grupo 15). Ver design-plan.md.
-# Antes de arrancar: cp .env.example .env (preencher) e bash scripts/gen-certs.sh
+# Bike-sharing platform (IdC 2026/27, group 15). See design-plan.md.
+# Before starting: bash scripts/setup.sh (creates .env and the certificates)
 name: bikesharing
 
 services:
@@ -7,12 +7,12 @@ services:
     image: eclipse-mosquitto:2.0.20
     entrypoint: ["/bin/sh", "/mosquitto/config/entrypoint.sh"]
     environment:
-      MQTT_CLIENT1_USER: ${MQTT_CLIENT1_USER:?defina no .env}
-      MQTT_CLIENT1_PASSWORD: ${MQTT_CLIENT1_PASSWORD:?defina no .env}
-      MQTT_PROCESSOR_USER: ${MQTT_PROCESSOR_USER:?defina no .env}
-      MQTT_PROCESSOR_PASSWORD: ${MQTT_PROCESSOR_PASSWORD:?defina no .env}
-      MQTT_NODERED_USER: ${MQTT_NODERED_USER:?defina no .env}
-      MQTT_NODERED_PASSWORD: ${MQTT_NODERED_PASSWORD:?defina no .env}
+      MQTT_CLIENT1_USER: ${MQTT_CLIENT1_USER:?set it in .env (run scripts/setup.sh)}
+      MQTT_CLIENT1_PASSWORD: ${MQTT_CLIENT1_PASSWORD:?set it in .env (run scripts/setup.sh)}
+      MQTT_PROCESSOR_USER: ${MQTT_PROCESSOR_USER:?set it in .env (run scripts/setup.sh)}
+      MQTT_PROCESSOR_PASSWORD: ${MQTT_PROCESSOR_PASSWORD:?set it in .env (run scripts/setup.sh)}
+      MQTT_NODERED_USER: ${MQTT_NODERED_USER:?set it in .env (run scripts/setup.sh)}
+      MQTT_NODERED_PASSWORD: ${MQTT_NODERED_PASSWORD:?set it in .env (run scripts/setup.sh)}
     volumes:
       - ./mosquitto/config:/mosquitto/config:ro
       - ./certs/ca.crt:/certs/ca.crt:ro
@@ -20,9 +20,9 @@ services:
       - ./certs/mosquitto.key:/certs/server.key:ro
       - mosquitto_data:/mosquitto/data
     ports:
-      - "1883:1883"   # MQTT sobre TLS
+      - "1883:1883"   # MQTT over TLS
     healthcheck:
-      # Ligação TLS real com autenticação; lê o tópico $SYS (retido) e sai à primeira mensagem
+      # Real TLS connection with authentication; reads the retained $SYS topic and exits on the first message
       test: ["CMD-SHELL", "mosquitto_sub -h localhost -p 1883 --cafile /certs/ca.crt -u \"$$MQTT_PROCESSOR_USER\" -P \"$$MQTT_PROCESSOR_PASSWORD\" -t '$$SYS/broker/uptime' -C 1 -W 5 > /dev/null"]
       interval: 10s
       timeout: 10s
@@ -38,14 +38,14 @@ services:
       - --ssl-key=/certs/server.key
       - --require-secure-transport=ON
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina no .env}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set it in .env (run scripts/setup.sh)}
       MYSQL_DATABASE: ${DB_NAME}
       DB_PROCESSOR_USER: ${DB_PROCESSOR_USER}
-      DB_PROCESSOR_PASSWORD: ${DB_PROCESSOR_PASSWORD:?defina no .env}
+      DB_PROCESSOR_PASSWORD: ${DB_PROCESSOR_PASSWORD:?set it in .env (run scripts/setup.sh)}
       DB_ML_USER: ${DB_ML_USER}
-      DB_ML_PASSWORD: ${DB_ML_PASSWORD:?defina no .env}
+      DB_ML_PASSWORD: ${DB_ML_PASSWORD:?set it in .env (run scripts/setup.sh)}
       DB_NODERED_USER: ${DB_NODERED_USER}
-      DB_NODERED_PASSWORD: ${DB_NODERED_PASSWORD:?defina no .env}
+      DB_NODERED_PASSWORD: ${DB_NODERED_PASSWORD:?set it in .env (run scripts/setup.sh)}
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d:ro
       - ./certs/ca.crt:/certs/ca.crt:ro
@@ -53,7 +53,7 @@ services:
       - ./certs/db.key:/certs/server.key:ro
       - db_data:/var/lib/mysql
     healthcheck:
-      # TCP (127.0.0.1) e não socket: durante a inicialização o servidor temporário não abre TCP
+      # TCP (127.0.0.1), not the socket: during initialisation the temporary server does not open TCP
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
       interval: 5s
       timeout: 5s
@@ -102,6 +102,9 @@ services:
       ML_URL: ${ML_URL}
       RETRAIN_EVERY_HOURS: ${RETRAIN_EVERY_HOURS}
       SUMMARY_INTERVAL_S: ${SUMMARY_INTERVAL_S}
+      WORKER_THREADS: ${WORKER_THREADS:-2}
+      WRITER_BATCH_SIZE: ${WRITER_BATCH_SIZE:-500}
+      WRITER_FLUSH_S: ${WRITER_FLUSH_S:-0.5}
       CA_CERT: /certs/ca.crt
       DATASET_DIR: /dataset
     volumes:
@@ -120,11 +123,11 @@ services:
     build: ./nodered
     environment:
       TZ: America/New_York
-      # O Node.js passa a confiar na CA do grupo: TLS verificado para o MySQL e o MQTT
+      # Node.js trusts the group CA: verified TLS to MySQL and MQTT
       NODE_EXTRA_CA_CERTS: /certs/ca.crt
       NODERED_ADMIN_USER: ${NODERED_ADMIN_USER}
-      NODERED_ADMIN_PASSWORD_HASH: ${NODERED_ADMIN_PASSWORD_HASH:?defina no .env}
-      NODERED_CREDENTIAL_SECRET: ${NODERED_CREDENTIAL_SECRET:?defina no .env}
+      NODERED_ADMIN_PASSWORD_HASH: ${NODERED_ADMIN_PASSWORD_HASH:?set it in .env (run scripts/setup.sh)}
+      NODERED_CREDENTIAL_SECRET: ${NODERED_CREDENTIAL_SECRET:?set it in .env (run scripts/setup.sh)}
       MQTT_USER: ${MQTT_NODERED_USER}
       MQTT_PASSWORD: ${MQTT_NODERED_PASSWORD}
       DB_USER: ${DB_NODERED_USER}

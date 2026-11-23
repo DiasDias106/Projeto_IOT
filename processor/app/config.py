@@ -1,4 +1,4 @@
-"""Configuração do Processor, lida das variáveis de ambiente (ver docker-compose.yml e .env.example)."""
+"""Processor configuration, read from environment variables (see docker-compose.yml and .env.example)."""
 from __future__ import annotations
 
 import os
@@ -8,7 +8,7 @@ from dataclasses import dataclass
 def _env(name: str, default: str | None = None) -> str:
     value = os.environ.get(name, default)
     if value is None or value == "":
-        raise RuntimeError(f"Variável de ambiente em falta: {name}")
+        raise RuntimeError(f"Missing environment variable: {name}")
     return value
 
 
@@ -29,6 +29,9 @@ class Config:
     retrain_every_hours: int
     summary_interval_s: float
     dataset_dir: str
+    worker_threads: int
+    writer_batch_size: int
+    writer_flush_s: float
 
     @classmethod
     def from_env(cls) -> "Config":
@@ -48,9 +51,12 @@ class Config:
             retrain_every_hours=int(_env("RETRAIN_EVERY_HOURS", "6")),
             summary_interval_s=float(_env("SUMMARY_INTERVAL_S", "2")),
             dataset_dir=_env("DATASET_DIR", "/dataset"),
+            worker_threads=max(1, int(_env("WORKER_THREADS", "2"))),
+            writer_batch_size=max(1, int(_env("WRITER_BATCH_SIZE", "500"))),
+            writer_flush_s=float(_env("WRITER_FLUSH_S", "0.5")),
         )
 
-    # Tópicos (design-plan.md, secção 2)
+    # Topics (design-plan.md, section 2)
     @property
     def topic_status_sub(self) -> str:
         return f"{self.topic_prefix}/status/+"

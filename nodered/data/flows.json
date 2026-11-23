@@ -286,18 +286,18 @@
     "id": "inject_s1_boot",
     "type": "inject",
     "z": "flow_s1_id",
-    "name": "Init",
+    "name": "Init + refresh 60 s",
     "props": [
       {
         "p": "payload"
       }
     ],
-    "repeat": "",
+    "repeat": "60",
     "crontab": "",
     "once": true,
-    "onceDelay": 2,
+    "onceDelay": "3",
     "topic": "",
-    "payload": "{\"start_date\": \"2024-03-13 00:00:00\", \"end_date\": \"2024-03-19 23:59:59\", \"granularity\": \"daily\", \"quality_flag\": \"OK\"}",
+    "payload": "{}",
     "payloadType": "json",
     "x": 140,
     "y": 60,
@@ -316,7 +316,7 @@
     "order": 1,
     "width": 12,
     "height": 2,
-    "format": "<div style=\"display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;\">\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Start Date</label>\n    <input type=\"date\" ng-model=\"filter.startDate\" ng-init=\"filter.startDate='2024-03-13'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">End Date</label>\n    <input type=\"date\" ng-model=\"filter.endDate\" ng-init=\"filter.endDate='2024-03-19'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Granularity</label>\n    <select ng-model=\"filter.granularity\" ng-init=\"filter.granularity='daily'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"hourly\">Hourly</option>\n      <option value=\"daily\">Daily</option>\n      <option value=\"weekly\">Weekly</option>\n    </select>\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Quality Flag</label>\n    <select ng-model=\"filter.qualityFlag\" ng-init=\"filter.qualityFlag='OK'\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"OK\">OK</option>\n      <option value=\"ALL\">ALL</option>\n      <option value=\"MISSING_END\">MISSING_END</option>\n      <option value=\"OUT_OF_AREA\">OUT_OF_AREA</option>\n      <option value=\"OUTLIER_SHORT\">OUTLIER_SHORT</option>\n      <option value=\"OUTLIER_LONG\">OUTLIER_LONG</option>\n    </select>\n  </div>\n  <div>\n    <button class=\"md-raised md-button md-primary\" ng-click=\"sendFilter()\" style=\"margin:0; background:#1f77b4; color:#fff;\">\n      Apply\n    </button>\n  </div>\n</div>\n<script>\n(function(scope) {\n  scope.filter = scope.filter || {\n    startDate: '2024-03-13',\n    endDate: '2024-03-19',\n    granularity: 'daily',\n    qualityFlag: 'OK'\n  };\n  scope.sendFilter = function() {\n    scope.send({\n      payload: {\n        start_date: scope.filter.startDate + ' 00:00:00',\n        end_date: scope.filter.endDate + ' 23:59:59',\n        granularity: scope.filter.granularity,\n        quality_flag: scope.filter.qualityFlag\n      }\n    });\n  };\n})(scope);\n</script>",
+    "format": "<div style=\"display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end;\">\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Start Date</label>\n    <input type=\"date\" ng-model=\"filter.startDate\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">End Date</label>\n    <input type=\"date\" ng-model=\"filter.endDate\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Granularity</label>\n    <select ng-model=\"filter.granularity\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"hourly\">Hourly</option>\n      <option value=\"daily\">Daily</option>\n      <option value=\"weekly\">Weekly</option>\n    </select>\n  </div>\n  <div style=\"display:flex; flex-direction:column; gap:2px;\">\n    <label style=\"font-size:11px; color:#aaa;\">Quality Flag</label>\n    <select ng-model=\"filter.qualityFlag\" style=\"background:#181818; color:#eee; border:1px solid #444; padding:5px 8px; border-radius:3px;\">\n      <option value=\"OK\">OK</option>\n      <option value=\"ALL\">ALL</option>\n      <option value=\"MISSING_END\">MISSING_END</option>\n      <option value=\"MISSING_START\">MISSING_START</option>\n      <option value=\"INVALID_DURATION\">INVALID_DURATION</option>\n      <option value=\"OUT_OF_AREA\">OUT_OF_AREA</option>\n      <option value=\"OUTLIER_SHORT\">OUTLIER_SHORT</option>\n      <option value=\"OUTLIER_LONG\">OUTLIER_LONG</option>\n      <option value=\"NEVER_ENDED\">NEVER_ENDED</option>\n    </select>\n  </div>\n  <div>\n    <button class=\"md-raised md-button md-primary\" ng-click=\"sendFilter()\" style=\"margin:0; background:#1f77b4; color:#fff;\">\n      Apply\n    </button>\n  </div>\n</div>\n<script>\n(function(scope) {\n  function day(d) {\n    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);\n  }\n  scope.filter = scope.filter || {\n    startDate: new Date(2024, 2, 13),\n    endDate: new Date(2024, 2, 22),\n    granularity: 'daily',\n    qualityFlag: 'OK'\n  };\n  scope.sendFilter = function() {\n    scope.send({\n      payload: {\n        start_date: day(scope.filter.startDate) + ' 00:00:00',\n        end_date: day(scope.filter.endDate) + ' 23:59:59',\n        granularity: scope.filter.granularity,\n        quality_flag: scope.filter.qualityFlag\n      }\n    });\n  };\n})(scope);\n</script>\n",
     "storeOutMessages": false,
     "fwdInMessages": false,
     "resendOnRefresh": false,
@@ -335,7 +335,7 @@
     "type": "function",
     "z": "flow_s1_id",
     "name": "Dispatch Queries",
-    "func": "var p = msg.payload || {};\nvar start_date = p.start_date || '2024-03-13 00:00:00';\nvar end_date = p.end_date || '2024-03-19 23:59:59';\nvar quality_flag = p.quality_flag || 'OK';\nvar granularity = p.granularity || 'daily';\n\nvar params = {\n    start_date: start_date,\n    end_date: end_date,\n    quality_flag: quality_flag\n};\n\nvar time_fmt = \"%Y-%m-%d\";\nif (granularity === 'hourly') time_fmt = \"%Y-%m-%d %H:00\";\nelse if (granularity === 'weekly') time_fmt = \"%Y-%U\";\n\nvar q1_sql = \"SELECT DATE_FORMAT(started_at, '\" + time_fmt + \"') AS time_bucket, \" +\n    \"member_casual, COUNT(*) AS trip_count \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_bucket, member_casual \" +\n    \"ORDER BY time_bucket ASC;\";\n\nvar q2_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_energy_kwh, \" +\n    \"ROUND(COALESCE(AVG(energy_kwh), 0), 3) AS avg_energy_kwh, \" +\n    \"COUNT(*) AS ebike_trips \" +\n    \"FROM trips \" +\n    \"WHERE rideable_type = 'electric_bike' \" +\n    \"AND started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date \" +\n    \"ORDER BY trip_date ASC;\";\n\nvar q3_sql = \"SELECT member_casual, COUNT(*) AS total_trips, \" +\n    \"ROUND(COALESCE(SUM(duration_s), 0) / 3600.0, 1) AS total_hours, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"SUM(CASE WHEN duration_s < 300 THEN 1 ELSE 0 END) AS under_5m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 300 AND 899 THEN 1 ELSE 0 END) AS m5_to_15m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 900 AND 1799 THEN 1 ELSE 0 END) AS m15_to_30m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 1800 AND 3599 THEN 1 ELSE 0 END) AS m30_to_60m, \" +\n    \"SUM(CASE WHEN duration_s >= 3600 THEN 1 ELSE 0 END) AS over_60m \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY member_casual;\";\n\nvar q4_sql = \"SELECT \" +\n    \"CASE \" +\n    \"  WHEN TIME(started_at) BETWEEN '07:00:00' AND '09:59:59' THEN 'Morning (07-10h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '10:00:00' AND '15:59:59' THEN 'Midday (10-16h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '16:00:00' AND '18:59:59' THEN 'Evening (16-19h)' \" +\n    \"  ELSE 'Night (19-07h)' \" +\n    \"END AS time_window, \" +\n    \"COUNT(*) AS trip_count, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_kwh \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_window \" +\n    \"ORDER BY time_window ASC;\";\n\nvar q5_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, member_casual, \" +\n    \"ROUND(COALESCE(SUM(cost_usd), 0), 2) AS total_revenue_usd, \" +\n    \"ROUND(COALESCE(AVG(cost_usd), 0), 2) AS avg_cost_usd \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date, member_casual \" +\n    \"ORDER BY trip_date ASC, member_casual;\";\n\nvar q6_sql = \"SELECT COALESCE(start_station_name, 'Unknown Station') AS station_name, \" +\n    \"COUNT(*) AS departures, \" +\n    \"SUM(CASE WHEN rideable_type = 'electric_bike' THEN 1 ELSE 0 END) AS ebike_departures, \" +\n    \"SUM(CASE WHEN member_casual = 'member' THEN 1 ELSE 0 END) AS member_departures \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"AND start_station_name IS NOT NULL \" +\n    \"GROUP BY start_station_name \" +\n    \"ORDER BY departures DESC \" +\n    \"LIMIT 10;\";\n\nreturn [\n    { topic: q1_sql, payload: params },\n    { topic: q2_sql, payload: params },\n    { topic: q3_sql, payload: params },\n    { topic: q4_sql, payload: params },\n    { topic: q5_sql, payload: params },\n    { topic: q6_sql, payload: params }\n];",
+    "func": "// A filter from the form is kept; the periodic refresh (empty payload) reuses it.\nvar p = msg.payload || {};\nif (p.start_date) flow.set('filters', p);\nelse p = flow.get('filters') || {};\nvar start_date = p.start_date || '2024-03-13 00:00:00';\nvar end_date = p.end_date || '2024-03-22 23:59:59';\nvar quality_flag = p.quality_flag || 'OK';\nvar granularity = p.granularity || 'daily';\n\nvar params = {\n    start_date: start_date,\n    end_date: end_date,\n    quality_flag: quality_flag\n};\n\nvar time_fmt = \"%Y-%m-%d\";\nif (granularity === 'hourly') time_fmt = \"%Y-%m-%d %H:00\";\nelse if (granularity === 'weekly') time_fmt = \"%Y-%U\";\n\nvar q1_sql = \"SELECT DATE_FORMAT(started_at, '\" + time_fmt + \"') AS time_bucket, \" +\n    \"member_casual, COUNT(*) AS trip_count \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_bucket, member_casual \" +\n    \"ORDER BY time_bucket ASC;\";\n\nvar q2_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_energy_kwh, \" +\n    \"ROUND(COALESCE(AVG(energy_kwh), 0), 3) AS avg_energy_kwh, \" +\n    \"COUNT(*) AS ebike_trips \" +\n    \"FROM trips \" +\n    \"WHERE rideable_type = 'electric_bike' \" +\n    \"AND started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date \" +\n    \"ORDER BY trip_date ASC;\";\n\nvar q3_sql = \"SELECT member_casual, COUNT(*) AS total_trips, \" +\n    \"ROUND(COALESCE(SUM(duration_s), 0) / 3600.0, 1) AS total_hours, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"SUM(CASE WHEN duration_s < 300 THEN 1 ELSE 0 END) AS under_5m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 300 AND 899 THEN 1 ELSE 0 END) AS m5_to_15m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 900 AND 1799 THEN 1 ELSE 0 END) AS m15_to_30m, \" +\n    \"SUM(CASE WHEN duration_s BETWEEN 1800 AND 3599 THEN 1 ELSE 0 END) AS m30_to_60m, \" +\n    \"SUM(CASE WHEN duration_s >= 3600 THEN 1 ELSE 0 END) AS over_60m \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY member_casual;\";\n\nvar q4_sql = \"SELECT \" +\n    \"CASE \" +\n    \"  WHEN TIME(started_at) BETWEEN '07:00:00' AND '09:59:59' THEN 'Morning (07-10h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '10:00:00' AND '15:59:59' THEN 'Midday (10-16h)' \" +\n    \"  WHEN TIME(started_at) BETWEEN '16:00:00' AND '18:59:59' THEN 'Evening (16-19h)' \" +\n    \"  ELSE 'Night (19-07h)' \" +\n    \"END AS time_window, \" +\n    \"COUNT(*) AS trip_count, \" +\n    \"ROUND(COALESCE(AVG(duration_s), 0) / 60.0, 1) AS avg_duration_min, \" +\n    \"ROUND(COALESCE(SUM(energy_kwh), 0), 2) AS total_kwh \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY time_window \" +\n    \"ORDER BY time_window ASC;\";\n\nvar q5_sql = \"SELECT DATE_FORMAT(started_at, '%Y-%m-%d') AS trip_date, member_casual, \" +\n    \"ROUND(COALESCE(SUM(cost_usd), 0), 2) AS total_revenue_usd, \" +\n    \"ROUND(COALESCE(AVG(cost_usd), 0), 2) AS avg_cost_usd \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"GROUP BY trip_date, member_casual \" +\n    \"ORDER BY trip_date ASC, member_casual;\";\n\nvar q6_sql = \"SELECT COALESCE(start_station_name, 'Unknown Station') AS station_name, \" +\n    \"COUNT(*) AS departures, \" +\n    \"SUM(CASE WHEN rideable_type = 'electric_bike' THEN 1 ELSE 0 END) AS ebike_departures, \" +\n    \"SUM(CASE WHEN member_casual = 'member' THEN 1 ELSE 0 END) AS member_departures \" +\n    \"FROM trips \" +\n    \"WHERE started_at >= :start_date AND started_at <= :end_date \" +\n    \"AND (quality_flag = :quality_flag OR :quality_flag = 'ALL') \" +\n    \"AND start_station_name IS NOT NULL \" +\n    \"GROUP BY start_station_name \" +\n    \"ORDER BY departures DESC \" +\n    \"LIMIT 10;\";\n\nreturn [\n    { topic: q1_sql, payload: params },\n    { topic: q2_sql, payload: params },\n    { topic: q3_sql, payload: params },\n    { topic: q4_sql, payload: params },\n    { topic: q5_sql, payload: params },\n    { topic: q6_sql, payload: params }\n];",
     "outputs": 6,
     "timeout": 0,
     "noerr": 0,
@@ -646,7 +646,7 @@
     "type": "function",
     "z": "flow_s1_id",
     "name": "Format Time of Day",
-    "func": "var rows = msg.payload || [];\nvar labels = [\n    \"Morning (07-10h)\",\n    \"Midday (10-16h)\",\n    \"Evening (16-19h)\",\n    \"Night (19-07h)\"\n];\nvar counts = [0, 0, 0, 0];\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        var w = r.time_window || '';\n        var cnt = Number(r.trip_count || 0);\n        if (w.indexOf('Morning') !== -1) counts[0] = cnt;\n        else if (w.indexOf('Midday') !== -1) counts[1] = cnt;\n        else if (w.indexOf('Evening') !== -1) counts[2] = cnt;\n        else if (w.indexOf('Night') !== -1) counts[3] = cnt;\n    });\n}\n\nreturn {\n    payload: [{\n        series: [\"Trips\"],\n        data: counts,\n        labels: labels\n    }]\n};",
+    "func": "var rows = msg.payload || [];\nvar labels = [\n    \"Morning (07-10h)\",\n    \"Midday (10-16h)\",\n    \"Evening (16-19h)\",\n    \"Night (19-07h)\"\n];\nvar counts = [0, 0, 0, 0];\n\nif (Array.isArray(rows) && rows.length > 0) {\n    rows.forEach(function(r) {\n        var w = r.time_window || '';\n        var cnt = Number(r.trip_count || 0);\n        if (w.indexOf('Morning') !== -1) counts[0] = cnt;\n        else if (w.indexOf('Midday') !== -1) counts[1] = cnt;\n        else if (w.indexOf('Evening') !== -1) counts[2] = cnt;\n        else if (w.indexOf('Night') !== -1) counts[3] = cnt;\n    });\n}\n\nreturn {\n    payload: [{\n        series: [\"Trips\"],\n        data: [counts],\n        labels: labels\n    }]\n};",
     "outputs": 1,
     "timeout": 0,
     "noerr": 0,
@@ -837,9 +837,9 @@
     "width": 12,
     "height": 6,
     "format": "<div style='overflow-x:auto;' ng-bind-html='msg.payload'></div>",
-    "storeOutMessages": false,
+    "storeOutMessages": true,
     "fwdInMessages": false,
-    "resendOnRefresh": false,
+    "resendOnRefresh": true,
     "templateScope": "local",
     "className": "",
     "x": 1150,
@@ -1024,8 +1024,8 @@
     "type": "worldmap",
     "z": "flow_clusters_id",
     "name": "Station Map",
-    "lat": "40.7282",
-    "lon": "-74.0776",
+    "lat": "40.7350",
+    "lon": "-74.0400",
     "zoom": "13",
     "layer": "OSM",
     "cluster": "",
@@ -1066,5 +1066,122 @@
     "wires": [
       []
     ]
+  },
+  {
+    "id": "mqtt_in_station_status",
+    "type": "mqtt in",
+    "z": "flow_clusters_id",
+    "name": "Sub: internal/status/+",
+    "topic": "idc/fc15/internal/status/+",
+    "qos": "1",
+    "datatype": "json",
+    "broker": "broker_mosquitto",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 160,
+    "y": 80,
+    "wires": [
+      [
+        "fn_station_marker"
+      ]
+    ]
+  },
+  {
+    "id": "fn_station_marker",
+    "type": "function",
+    "z": "flow_clusters_id",
+    "name": "Station Marker",
+    "outputs": 1,
+    "x": 420,
+    "y": 80,
+    "wires": [
+      [
+        "worldmap_node_id"
+      ]
+    ],
+    "func": "// One marker per station; the latest status is kept so a new training can recolour the map.\nvar s = msg.payload;\nif (!s || !s.station_id || s.lat == null || s.lon == null) return null;\nvar stations = flow.get('stations') || {};\nstations[s.station_id] = s;\nflow.set('stations', stations);\nreturn { payload: global.get('stationMarker')(s, flow.get('clusters') || {}) };"
+  },
+  {
+    "id": "inject_clusters",
+    "type": "inject",
+    "z": "flow_clusters_id",
+    "name": "Clusters every 60 s",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "3",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 170,
+    "y": 160,
+    "wires": [
+      [
+        "fn_clusters_sql"
+      ]
+    ]
+  },
+  {
+    "id": "fn_clusters_sql",
+    "type": "function",
+    "z": "flow_clusters_id",
+    "name": "SQL: latest clusters",
+    "outputs": 1,
+    "x": 400,
+    "y": 160,
+    "wires": [
+      [
+        "sql_clusters"
+      ]
+    ],
+    "func": "msg.topic = \"SELECT station_id, cluster, k, trained_at FROM station_clusters \" +\n    \"WHERE trained_at = (SELECT MAX(trained_at) FROM station_clusters);\";\nmsg.payload = {};\nreturn msg;"
+  },
+  {
+    "id": "sql_clusters",
+    "type": "Stackhero-MySQL",
+    "z": "flow_clusters_id",
+    "server": "mysql_bikesharing_db",
+    "name": "MySQL: clusters",
+    "x": 610,
+    "y": 160,
+    "wires": [
+      [
+        "fn_apply_clusters"
+      ]
+    ]
+  },
+  {
+    "id": "fn_apply_clusters",
+    "type": "function",
+    "z": "flow_clusters_id",
+    "name": "Recolour Markers",
+    "outputs": 1,
+    "x": 810,
+    "y": 160,
+    "wires": [
+      [
+        "worldmap_node_id"
+      ]
+    ],
+    "func": "var rows = Array.isArray(msg.payload) ? msg.payload : [];\nvar clusters = {};\nrows.forEach(function(r) { clusters[r.station_id] = { cluster: r.cluster, k: r.k, trained_at: r.trained_at }; });\nvar before = JSON.stringify(flow.get('clusters') || {});\nflow.set('clusters', clusters);\nif (JSON.stringify(clusters) === before) return null;   // nothing new since the last check\nvar stations = flow.get('stations') || {};\nvar marker = global.get('stationMarker');\nreturn [Object.keys(stations).map(function(id) { return { payload: marker(stations[id], clusters) }; })];"
+  },
+  {
+    "id": "fn_marker_helper",
+    "type": "function",
+    "z": "flow_clusters_id",
+    "name": "Marker style (on start)",
+    "outputs": 0,
+    "x": 180,
+    "y": 240,
+    "wires": [],
+    "initialize": "// Shared by Station Marker and Recolour Markers. Cluster 0 = least used (ml/app/model.py).\nvar COLOURS = ['#1f77b4', '#2ca02c', '#ff7f0e', '#d62728', '#9467bd'];\nglobal.set('stationMarker', function(s, clusters) {\n    var c = clusters[s.station_id];\n    var flagged = s.quality_flag && s.quality_flag !== 'OK';\n    return {\n        name: s.name || s.station_id,\n        lat: s.lat,\n        lon: s.lon,\n        icon: 'fa-bicycle',\n        iconColor: flagged ? '#000000' : (c ? COLOURS[c.cluster % COLOURS.length] : '#888888'),\n        layer: c ? 'Cluster ' + c.cluster : 'No cluster yet',\n        station_id: s.station_id,\n        bikes: s.num_bikes_available + ' (' + s.num_ebikes_available + ' e-bikes)',\n        docks: s.num_docks_available + ' of ' + s.capacity,\n        cluster: c ? c.cluster + ' of ' + c.k + ' (0 = least used)' : 'none yet',\n        quality: s.quality_flag,\n        updated: s.ts\n    };\n});",
+    "func": "return null;"
   }
 ]

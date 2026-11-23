@@ -1,4 +1,4 @@
-"""Ligação ao MySQL sobre TLS (utilizador ml: lê tudo, escreve só station_clusters)."""
+"""MySQL connection over TLS (user ml: reads everything, writes only station_clusters)."""
 from __future__ import annotations
 
 import os

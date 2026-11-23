@@ -1,8 +1,8 @@
-"""Serviço ML em Flask sobre HTTPS (design-plan.md, secção 5).
+"""ML service in Flask over HTTPS (design-plan.md, section 5).
 
   GET  /health     -> {"status": "ok"}
-  POST /train      -> treina com os dados atuais e grava em station_clusters
-  GET  /clusters   -> atribuições do treino mais recente
+  POST /train      -> trains on the current data and writes station_clusters
+  GET  /clusters   -> assignments of the newest training
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from .model import latest_clusters, train_and_store
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
 app = Flask(__name__)
-_train_lock = threading.Lock()   # um treino de cada vez
+_train_lock = threading.Lock()   # one training at a time
 
 
 @app.get("/health")
@@ -29,13 +29,13 @@ def health():
 @app.post("/train")
 def train():
     if not _train_lock.acquire(blocking=False):
-        return jsonify(error="treino já em curso"), 409
+        return jsonify(error="training already running"), 409
     conn = db.connect()
     try:
         result = train_and_store(conn, build_features(conn))
         return jsonify(result)
-    except NotImplementedError:
-        return jsonify(error="TODO: treino ainda não implementado"), 501
+    except ValueError as exc:
+        return jsonify(error=str(exc)), 422
     finally:
         conn.close()
         _train_lock.release()
@@ -46,8 +46,6 @@ def clusters():
     conn = db.connect()
     try:
         return jsonify(latest_clusters(conn))
-    except NotImplementedError:
-        return jsonify(error="TODO: ainda não implementado"), 501
     finally:
         conn.close()
 
