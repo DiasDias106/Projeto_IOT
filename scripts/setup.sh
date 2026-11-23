@@ -129,6 +129,15 @@ fi
 $DOCKER compose version >/dev/null 2>&1 || die "The Docker Compose plugin is missing ('docker compose')."
 echo "Docker OK: $($DOCKER --version)"
 
+# Two engines (for example Docker Desktop or rootless for the user, plus the system engine for sudo)
+# keep separate containers: a stack started on one blocks the ports for the other.
+if [ "$DOCKER" = "docker" ] && [ -n "$SUDO" ] && sudo -n docker info >/dev/null 2>&1; then
+  if [ "$(docker info -f '{{.ID}}' 2>/dev/null)" != "$(sudo -n docker info -f '{{.ID}}' 2>/dev/null)" ] \
+     && [ -n "$(sudo -n docker compose ps -q 2>/dev/null)" ]; then
+    die "This project is running on the system Docker engine (sudo docker), but your 'docker' uses another engine. Stop it with 'sudo docker compose down' and run again."
+  fi
+fi
+
 # ---------- 3. Python venv for client1 and the tools on the host ----------
 
 say "Python virtual environment (.venv)"
@@ -190,7 +199,16 @@ if [ "$RESET" = 1 ]; then
   say "Deleting the database volume (docker compose down -v)"
   $DOCKER compose down -v
 fi
+port_busy() { (exec 3<>"/dev/tcp/127.0.0.1/$1") 2>/dev/null; }
 if [ "$START" = 1 ]; then
+  say "Checking ports 1883 and 1880"
+  running="$($DOCKER compose ps --services --status running 2>/dev/null || true)"
+  for pair in 1883:mosquitto 1880:nodered; do
+    port="${pair%%:*}" svc="${pair##*:}"
+    if port_busy "$port" && ! grep -qx "$svc" <<<"$running"; then
+      die "Port $port is already in use by another program. Find it with: sudo ss -ltnp 'sport = :$port' (a local mosquitto: sudo systemctl disable --now mosquitto)."
+    fi
+  done
   say "Starting the services"
   $DOCKER compose up -d --build
   $DOCKER compose ps
