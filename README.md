@@ -42,6 +42,8 @@ Options: `--start` also starts the services (`scripts/run.sh`), and `--reset` de
 
 ## Run
 
+Order: start the services (the processor loads stage 1 by itself), open the dashboard (Client 2), then start Client 1.
+
 ```bash
 bash scripts/run.sh             # start, wait until ready, print the URLs
 bash scripts/run.sh restart     # restart, wait, print the URLs
@@ -50,7 +52,7 @@ bash scripts/run.sh stop        # stop (data kept)
 bash scripts/run.sh logs processor
 ```
 
-On the first start the processor loads stage 1 (about 5 s) and requests the first training. A restart does not load it again. The dashboard refreshes every 60 s.
+On the first start the processor loads stage 1 (about 5 s) and requests the first training. A restart does not load it again.
 
 Replay stage 2 (Client 1) in another terminal:
 
@@ -59,12 +61,17 @@ Replay stage 2 (Client 1) in another terminal:
 python client1/publisher.py --speed 60  # 60 = 1 h of data per minute; 0 = no waiting
 ```
 
-- Dashboard: https://localhost:1880/ui (tabs Historical Analytics, Live Operations, Map)
-- Editor: https://localhost:1880 (user `admin`)
+After a `git pull`, run `bash scripts/run.sh restart`: Node-RED reads `flows.json` only at start. After a schema change (`db/init/`), recreate the database with `docker compose down -v`. This deletes the data.
 
-The browser warns about the certificate because the group CA signs it. Import `certs/ca.crt` into the browser, or accept the warning.
+## Dashboard
 
-After a schema change (`db/init/`), recreate the database with `docker compose down -v`. This deletes the data.
+https://localhost:1880/ui. The editor is at https://localhost:1880 (user `admin`). The browser warns about the certificate because the group CA signs it: import `certs/ca.crt` into the browser, or accept the warning.
+
+| Tab | Content | Source |
+|---|---|---|
+| Historical Analytics | trip volume, energy, duration, time of day, revenue, top stations; filters by date, granularity and quality flag | MySQL, refreshed every 60 s |
+| Live Operations | bikes in use, bikes and e-bikes available, stage 2 energy and average duration | `internal/live_summary`, every 2 s |
+| Map | one marker per station, coloured by its latest cluster (black: last status flagged); click for bikes, docks and flag | `internal/status/<id>` + `station_clusters` |
 
 ## MQTT topics
 
@@ -101,10 +108,20 @@ Dashboard queries use `WHERE quality_flag = 'OK'`.
 
 ## Node-RED connections
 
-Credentials come from the container's environment. In the user and password fields, write `${MQTT_USER}`, `${MQTT_PASSWORD}`, `${DB_USER}` and `${DB_PASSWORD}`. No password is stored in the flows.
+Credentials come from the container's environment. `settings.js` writes `flows_cred.json` at every start with only the references `${MQTT_USER}`, `${MQTT_PASSWORD}`, `${DB_USER}` and `${DB_PASSWORD}`. No password is stored in the flows, and nothing needs to be typed in the editor. Before you click *Deploy*, reload any editor tab that was open before a restart, or the old flows overwrite `flows.json`.
 
 - **MQTT** (`mqtt in` node): server `mosquitto`, port `1883`, *Use TLS* with CA `/certs/ca.crt` and *Verify server certificate*. It can only subscribe to `idc/fc15/internal/#`.
 - **MySQL** (`Stackhero-MySQL` node): host `db`, port `3306`, database `bikesharing`, *Encrypt connection*. The SQL goes in `msg.topic`, the parameters in `msg.payload`. `node-red-node-mysql` does not support TLS, so it cannot be used.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `port 1883` or `1880` already in use | another program uses it: `sudo ss -ltnp 'sport = :1883'` (a local mosquitto: `sudo systemctl disable --now mosquitto`) |
+| ports in use, but `docker ps` shows nothing | two Docker engines (Docker Desktop and the system one): `docker context use default` |
+| `Access denied for user ''` in Node-RED | Node-RED runs old flows: `bash scripts/run.sh restart`. `docker compose logs` also shows old lines: add `--since 5m` |
+| dashboard empty | wait up to 60 s after start, or check `bash scripts/run.sh logs nodered` |
+| `CERTIFICATE_VERIFY_FAILED` | certificates from an older version: `bash scripts/setup.sh --no-install` regenerates them |
 
 ## Tests and tools
 
